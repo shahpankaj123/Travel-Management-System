@@ -137,9 +137,4 @@ JAZZMIN_SETTINGS = {
 
     "login_logo": None,
     "welcome_sign": "Welcome to the Admin Pannel",
-
-    "usermenu_links": [
-        {"name": "Log out", "url": "http://127.0.0.1:8000/logout/", "new_window": False},
-        {"model": "auth.user"}
-    ],
 }
