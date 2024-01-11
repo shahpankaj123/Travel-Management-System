@@ -29,8 +29,7 @@ def populate(sender, instance=None, created=False, **kwargs):
         for _ in range(int(capacity/2)):
             for j in ['1', '2']:
                 ins = Seat(bus_id=instance, number=chr(cap_a)+j)
-                print(ins.id)
-                print(ins.number)
+
                 ins.save()
             cap_a += 1
 

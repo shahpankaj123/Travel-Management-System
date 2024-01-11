@@ -19,7 +19,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls, name='adminpannel'),
-    path("bus/", include("bus_reserve.urls"), name="bus")
+    path("", include("bus_reserve.urls"), name="bus")
 ]
 
 from django.conf.urls.static import static

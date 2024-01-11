@@ -28,9 +28,9 @@ class Bus(models.Model):
 
 class BusSchedule(models.Model):
     id = models.UUIDField(default=uuid4, primary_key=True, blank=True)
-    bus_id = models.OneToOneField(Bus, on_delete=models.CASCADE)
-    datetime = models.DateTimeField()
-    route_id = models.OneToOneField(Route, on_delete=models.CASCADE)
+    bus_id = models.ForeignKey(Bus, on_delete=models.CASCADE)
+    depart_date = models.DateTimeField()
+    route_id = models.ForeignKey(Route, on_delete=models.CASCADE)
 
 class Seat(models.Model):
     id = models.UUIDField(default=uuid4, primary_key=True, blank=True)
