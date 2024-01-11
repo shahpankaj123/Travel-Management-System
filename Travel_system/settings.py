@@ -128,13 +128,16 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+#admin pannel UI design
 
 JAZZMIN_SETTINGS = {
-    "site_title": "Library Admin",
-    "site_header": "Library",
-    "site_brand": "Admin Pannel",
-    "site_logo": "books/img/logo.png",
-
-    "login_logo": None,
+    "site_title": "TMS Admin",
+    "site_brand": "Admin Pannel",  
     "welcome_sign": "Welcome to the Admin Pannel",
+    "show_sidebar": True,
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "theme": "darkly",
+    "dark_mode_theme": "darkly",
 }
