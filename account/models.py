@@ -1,6 +1,5 @@
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.db import models
-from django.utils import timezone
 
 class UserManager(BaseUserManager):
     def create_user(self, email, name, ph, password=None, password2=None):
@@ -13,6 +12,8 @@ class UserManager(BaseUserManager):
             ph=ph
         )
 
+        if password != password2:
+            raise ValueError("Passwords donot match")
         user.set_password(password)
         user.save(using=self._db)
         return user

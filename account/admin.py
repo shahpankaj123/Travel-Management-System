@@ -11,7 +11,8 @@ class UserAdmin(BaseUserAdmin):
     fieldsets = [
         ("User Credentials", {"fields": ["email", "password"]}),
         ("Personal info", {"fields": ["name","ph"]}),
-        ("Permissions", {"fields": ["is_superuser","is_admin","is_active","is_merchant","is_staff_member","is_customer_user","groups","user_permissions"]}),
+        ("Permissions", {"fields": ["is_superuser","is_admin","is_active","is_merchant","is_staff_member",\
+                                    "is_customer_user","groups","user_permissions"]}),
         ("Token_Verify",{"fields":["tc"]})
     ]
     # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
@@ -21,7 +22,9 @@ class UserAdmin(BaseUserAdmin):
             None,
             {
                 "classes": ["wide"],
-                "fields": ["email", "name","ph" ,"password1", "password2","is_superuser","is_admin","is_active","is_merchant","is_staff_member","is_customer_user","groups","user_permissions"],
+                "fields": ["email", "name","ph" ,"password1", "password2","is_superuser",\
+                           "is_admin","is_active","is_merchant","is_staff_member","is_customer_user",\
+                           "groups","user_permissions"],
             },
         ),
     ]

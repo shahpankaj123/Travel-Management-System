@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    {% for seat in seats %}
+        <a href="/book/{{seat.id}}"><p class="seat">{{seat.number}}</p></a>
+    {% endfor %}
+<!-- 
+    <div id="seatholder">
+
+    </div>
+
+    <script>
+        var seats = document.getElementsByClassName("seat")
+
+        seatholder = document.getElementById("seatholder")
+        
+        var arranged_seats = '';
+
+        len = seats.length
+        console.log(seats[1])
+        console.log("as")
+        for(var i=0; i<len/2; i++) {
+            for(var j =0; j<2; j++){
+                arranged_seats += seats[i+j].innerHTML
+                if(j==1){
+                    arranged_seats += '<br>';
+                }
+            }
+        }
+
+        for(var i = 0; i<len; i++) {
+            seats[i].setAttribute("hidden", "True")
+        }
+
+        seatholder.innerHTML=arranged_seats;
+
+    </script> -->
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <form method="POST" action="{% url 'home' %}">
+        {% csrf_token %}
+        <select name="depart">
+            {% for loc in locations %}
+                <option value="{{loc.0}}">{{loc.1}}</option>
+            {% endfor %}
+        </select>
+
+        <select name="arrive">
+            {% for loc in locations %}
+                <option value="{{loc.0}}">{{loc.1}}</option>
+            {% endfor %}
+        </select>
+
+        <input type="date">
+
+
+        <button type="submit">submit</button>
+
+    </form>
+
+{% endblock %}

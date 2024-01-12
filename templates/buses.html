@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    {% for bus in buses %}
+        <p>{{bus.route_id.get_depart_loc_display}}</p>
+        <p>{{bus.route_id.get_arrive_loc_display}}</p>
+        <a href="/bus/seats/{{bus.id}}"><p>{{bus.bus_id.model}}</p></a>
+        <p>{{bus.bus_id.capacity}}</p>
+        <p>{{bus.datetime}}</p>
+
+    {% endfor %}
+
+{% endblock %}
