@@ -2,7 +2,11 @@
 {% block content %}
 
     {% for seat in seats %}
-        <a href="/book/{{seat.id}}"><p class="seat">{{seat.number}}</p></a>
+    <form method="POST" action="">
+        {% csrf_token %}
+        <input hidden="True" value="{{seat.id}}" name="seat">
+        <button type="submit">{{seat.number}}</button>
+    </form>
     {% endfor %}
 <!-- 
     <div id="seatholder">

@@ -1,14 +1,22 @@
+<!-- after user books the seat they are sent here -->
+
 {% extends 'base.html' %}
 {% block content %}
 
-{% endblock %}
-    <form method="POST" action="{% url 'book' %}">
-        {% csrf_token %}
-        <button type="submit">Book ticket</button>
-    </form>
-
     <h1>Ticket details</h1>
+    
+    <p>{{ticket.seat_id.number}}</p>
+    <p>{{ticket.ticket_num}}</p>
+    <p>{{ticket.schedule_id.datetime}}</p>
+    <p>{{ticket.schedule_id.route_id.price}}</p>
+    <p>{{ticket.schedule_id.route_id.arrive_loc}}</p>
+    <p>{{ticket.schedule_id.route_id.depart_loc}}</p>
+
+    <form method="POST" action="">
+        {% csrf_token %}
+        <button type="submit">Refund</button>
+    </form>
 
     
 
-{% blockcontent %}
+    {% endblock %}
