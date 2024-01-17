@@ -44,8 +44,8 @@ class TicketHistoryAdmin(admin.ModelAdmin):
         model = models.TicketHistory
         fields = '__all__'
 
-@admin.register(models.DepartInfo)
-class DepartInfoAdmin(admin.ModelAdmin):
-    class Meta:
-        model = models.DepartInfo
-        fields = '__all__'
+# @admin.register(models.DepartInfo)
+# class DepartInfoAdmin(admin.ModelAdmin):
+#     class Meta:
+#         model = models.DepartInfo
+#         fields = '__all__'

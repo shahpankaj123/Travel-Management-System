@@ -55,8 +55,8 @@ class TicketOrder(models.Model):
     id = models.UUIDField(default=uuid4, primary_key=True, blank=True)
     bought_date = models.DateTimeField(auto_now_add=True)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    passenger_name = models.CharField(max_length=60, blank=True)
-    passenger_phone = models.IntegerField(default=1)
+  #  passenger_name = models.CharField(max_length=60, blank=True)
+  #  passenger_phone = models.IntegerField(default=1)
     transaction_id = models.ForeignKey('TransactionTable', default="Refunded", on_delete=models.SET_DEFAULT)
     ticket_id = models.OneToOneField(Ticket, on_delete=models.CASCADE)
     
@@ -65,11 +65,11 @@ class TransactionTable(models.Model):
     t_date = models.DateTimeField(auto_now_add=True)
     user_id = models.ForeignKey(User, on_delete=models.RESTRICT)
 
-class DepartInfo(models.Model):
-    id = models.UUIDField(default=uuid4, primary_key=True, blank=True)
-    passenger_arrived = models.BooleanField(default=False)
-    ticket_order_id = models.ForeignKey(TicketOrder, on_delete=models.CASCADE)
-    bus_problem = models.BooleanField(default=False)
+# class DepartInfo(models.Model):
+#     id = models.UUIDField(default=uuid4, primary_key=True, blank=True)
+#     passenger_arrived = models.BooleanField(default=False)
+#     ticket_order_id = models.ForeignKey(TicketOrder, on_delete=models.CASCADE)
+#     bus_problem = models.BooleanField(default=False)
 
 class TicketHistory(models.Model):
     id = models.UUIDField(default=uuid4, primary_key=True, blank=True)
