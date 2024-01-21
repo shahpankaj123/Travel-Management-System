@@ -26,17 +26,17 @@ class SeatAdmin(admin.ModelAdmin):
         model = models.Seat
         fields = '__all__'
 
-@admin.register(models.Ticket)
-class TicketAdmin(admin.ModelAdmin):
-    class Meta:
-        model = models.Ticket
-        fields = '__all__'
+# @admin.register(models.Ticket)
+# class TicketAdmin(admin.ModelAdmin):
+#     class Meta:
+#         model = models.Ticket
+#         fields = '__all__'
 
-@admin.register(models.TicketOrder)
-class TicketOrderAdmin(admin.ModelAdmin):
-    class Meta:
-        model = models.TicketOrder
-        fields = '__all__'
+# @admin.register(models.TicketOrder)
+# class TicketOrderAdmin(admin.ModelAdmin):
+#     class Meta:
+#         model = models.TicketOrder
+#         fields = '__all__'
 
 @admin.register(models.TicketHistory)
 class TicketHistoryAdmin(admin.ModelAdmin):

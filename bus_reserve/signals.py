@@ -6,7 +6,6 @@ import string
 from .models import (
     Bus,
     BusSchedule,
-    Ticket,
     Seat
 )
 
@@ -40,12 +39,12 @@ def clean_images(sender, instance=None, **kwargs):
         instance.image.delete(False)
 
 
-@receiver(post_save, sender=BusSchedule)
-def populate_tickets(sender, instance=None, created=False, **kwargs):
-    if created:
-        seats = Seat.objects.filter(bus_id=instance.bus_id)
+# @receiver(post_save, sender=BusSchedule)
+# def populate_tickets(sender, instance=None, created=False, **kwargs):
+#     if created:
+#         seats = Seat.objects.filter(bus_id=instance.bus_id)
 
-        for seat in seats:
-            ins = Ticket(ticket_num=get_ticket_num(), schedule_id=instance, seat_id=seat)
-            ins.save()
+#         for seat in seats:
+#             ins = Ticket(ticket_num=get_ticket_num(), schedule_id=instance, seat_id=seat)
+#             ins.save()
 

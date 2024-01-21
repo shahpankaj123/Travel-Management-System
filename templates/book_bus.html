@@ -1,0 +1,132 @@
+{% extends 'setup/base.html' %}
+
+
+
+{% block content %}
+<style>
+    /* Updated styles for a more visually appealing design */
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); /* 3 columns of equal width */
+        gap: 10px; /* 10px gap between items */
+        justify-items: center;
+        margin: 20px;
+    }
+
+    .grid-item {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        background-color: #ddd;
+        border: 1px solid #888;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    .seat-number {
+        font-size: 18px;
+        margin-bottom: 5px;
+    }
+
+    /* Style the selected seats */
+    .seat-selected {
+        background-color: green;
+        color: white;
+    }
+
+    /* Style the booked seats */
+    .seat-booked {
+        background-color: red;
+        color: white;
+        cursor: not-allowed;
+    }
+
+    /* Style the Submit button */
+    #submit {
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    #submit:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+<h1>Bus Seats Selection Menu</h1>
+{% csrf_token %}
+<div class="grid-container">
+    {% for seat in seats %}
+        {% if seat.is_free %}
+            <div class="grid-item seat-available" id="{{ seat.number }}" onclick="toggleSeat(this)">
+                <div class="seat-number">{{ seat.number }}</div>
+                <p class="seat-id" hidden="True">{{seat.id}}</p>
+                <div class="custom-checkbox">&#10003;</div>
+            </div>
+        {% else %}
+            <div class="grid-item seat-booked" id="{{ seat.number }}">
+                <div class="seat-number">{{ seat.number }}</div>
+                <p class="seat-id" hidden="True">{{seat.id}}</p>
+                <div class="custom-checkbox">&#10003;</div>
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>
+<!-- Create a button to submit the selected seats -->
+<button id="submit" onclick="submitSeats()">Submit</button>
+<script>
+    function toggleSeat(seatElement) {
+        seatElement.classList.toggle("seat-selected");
+    }
+
+    function submitSeats() {
+        var selectedSeats = document.querySelectorAll(".seat-selected");
+        var selectedSeatNumbers = Array.from(selectedSeats).map(function(seat) {
+            return seat.querySelector(".seat-id").innerText;
+        });
+        
+        var postData = {
+            selectedSeats: selectedSeatNumbers
+        };
+
+        var csrftoken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+      
+        // Create a new XMLHttpRequest object
+        var xhr = new XMLHttpRequest();
+
+
+        // Configure it for a POST request to 'http://localhost/test'
+        xhr.open('POST', window.location.href, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+
+        // Define the callback function to handle the response
+        xhr.onload = function() {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                console.log('Success:', xhr.responseText);
+                window.location.reload()
+            } else {
+                console.error('Request failed with status:', xhr.status);
+            }
+        };
+
+
+        // Convert the postData object to a JSON string and send it
+        xhr.send(JSON.stringify(postData));
+    }
+
+
+</script>
+
+{% endblock %}
+
+{% block footer %}
+    {% include "setup/footer.html" %}
+{% endblock %}
