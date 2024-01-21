@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -151,3 +152,24 @@ JAZZMIN_UI_TWEAKS = {
     "theme": "darkly",
     "dark_mode_theme": "darkly",
 }
+
+#custom auth
+AUTHENTICATION_BACKENDS = ['account.authentication_backends.CustomAuthBackend', 'django.contrib.auth.backends.ModelBackend']
+
+#email setup
+email_user=config('EMAIL_USER')
+email_pass=config('EMAIL_PASSWORD')
+
+EMAIL_BACKEND = 'Travel_system.email_backends.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = email_user
+EMAIL_HOST_PASSWORD = email_pass
+EMAIL_USE_SSL = False
+
+#celery setup
+CELERY_BROKER_URL="redis://127.0.0.1:6379/0"
+CELERY_TIMEZONE = "Asia/Kathmandu"
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
