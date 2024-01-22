@@ -13,7 +13,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 import random
 from .tasks import send_activation_email,send_mail_verify
-
+from bus_reserve.models import *
  
 
 class Signup(View): 
@@ -161,3 +161,79 @@ class Changepassword(View):
         else:
             messages.warning(request,"Invalid Error")
             return redirect('Login')
+
+@method_decorator(login_required(login_url='Login'), name='dispatch')
+class MyOrder(View):
+  def get(self, request, *args, **kwargs):
+    user_id=request.user.id  
+    ticket_orders = TicketOrder.objects.filter(user_id=user_id)
+    return render(request,'account/Order.html',{'ticket_orders': ticket_orders})
+
+@method_decorator(login_required(login_url='Login'), name='dispatch')  
+class MyDetail(View):
+    def get(self, request, *args, **kwargs):
+        user=User.objects.get(id=request.user.id)
+        return render(request,{'user':user})
+
+@method_decorator(login_required(login_url='Login'), name='dispatch')   
+class Change_password(View):
+    def get(self, request, *args, **kwargs):
+        return render(request,'account/reset_password.html')
+    
+    def post(self,request):
+        password1=request.POST['password1']
+        password2=request.POST['password2']
+        password3=request.POST['password3']
+        user=User.objects.get(id=request.user.id)
+        print(user.password,password1,password2,password3)
+
+        if not user.check_password(password1):
+            messages.warning(request,"Old Password Not Matched")
+            return redirect('change_password')
+        
+        if password3 !=password2:
+            messages.warning(request,"Confirm Password Not Matched")
+            return redirect('change_password')
+        
+        user.set_password(password2)
+        user.save()
+
+        updated_user = authenticate(request,email=user.email, password=password2)
+        login(request,updated_user)
+
+        messages.success(request,"Password Changed successfully")
+        return redirect('home')
+
+@method_decorator(login_required(login_url='Login'), name='dispatch')
+class User_details(View):
+    def get(self, request, *args, **kwargs):
+        return render(request,'account/user_details.html')
+    
+
+@method_decorator(login_required(login_url='Login'), name='dispatch')    
+class Edit_user(View):   
+    def get(self, request, *args, **kwargs):
+        return render(request,'account/edit_user.html') 
+    
+    def post(self,request):
+        username=request.POST['username']
+        email=request.POST['email']
+        ph=request.POST['ph']
+
+        user=User.objects.get(id=request.user.id)
+
+        user.username=username
+        user.email=email
+        user.ph=ph
+
+        user.save()
+        messages.success(request,"Details Changed successfully")
+        return redirect('home')
+
+
+
+
+
+
+
+

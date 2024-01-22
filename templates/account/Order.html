@@ -1,0 +1,59 @@
+{% extends 'setup/base.html' %}
+{% load static %}
+{% block style %}
+body {
+    background-color: #6998AB;   
+}
+{% endblock %}
+{% block title %}Order Page {% endblock %}
+
+{%block header %}
+{% include "setup/nav.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <div class="container">
+        
+    <h2 class="mb-4">My Order</h2>
+
+    {% if ticket_orders %}
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+            <tr>
+                <th>Order ID</th>
+                <th>Bought Date</th>
+                <th>Ticket Number</th>
+                <th>Departure Time</th>
+                <th>Departure Location</th>
+                <th>Arrival Location</th>
+                <th>Bus Model</th>
+                <th>Seat Number</th>
+              </tr>
+        </tr>
+      </thead>
+      <tbody>
+         {% for order in ticket_orders %}
+        <tr>
+          <td>{{ order.id }}</td>
+          <td>{{ order.bought_date }}</td>
+          <td>{{ order.ticket_id.ticket_num }}</td>
+          <td>{{ order.ticket_id.schedule_id.datetime }}</td>
+          <td>{{ order.ticket_id.schedule_id.route_id.get_depart_loc_display }}</td>
+          <td>{{ order.ticket_id.schedule_id.route_id.get_arrive_loc_display }}</td>
+          <td>{{ order.ticket_id.schedule_id.bus_id.model }}</td>
+          <td>{{ order.ticket_id.seat_id.number }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <h4>No orders found for this user.</h4>
+    {% endif %}
+  </div>
+</div>
+
+
+{% endblock %}
+

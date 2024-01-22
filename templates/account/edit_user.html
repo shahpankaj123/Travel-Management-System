@@ -1,0 +1,102 @@
+{% extends 'setup/base.html' %}
+{% load static %}
+{% block style %}
+body {
+    background-color: #6998AB;   
+}
+.container1{
+    background-color: #ADD1C7;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.form {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+input {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #4caf50;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+a button{
+    background-color: #c1cada;
+}
+
+a button:hover{
+    background-color: #94ad93;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+.ft p{   
+    color: #4169e1;
+    font-size: 14px;
+    margin-top: -15px;
+}
+.ft p a{
+    text-decoration: none;
+}
+.ft p a:hover{
+    text-decoration: underline;
+}
+{% endblock %}
+{% block title %}UserEdit Page {% endblock %}
+
+{%block header %}
+{% include "setup/nav.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <div class="container">
+    <form id="signupForm" class="form" method="post">
+        {% csrf_token %}
+        <h2>Change Details</h2>
+        <br>
+        <div class="input-group">
+            <label for="email">Username:</label>
+            <input type="text" id="email" type="Password" name="username" value="{{request.user.username}}" required>
+        </div>
+        <div class="input-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" type="Password" name="email" value="{{request.user.email}}" required>
+        </div>
+        <div class="input-group">
+            <label for="email">Phone Number:</label>
+            <input type="number" id="email" type="Password" name="ph" value="{{request.user.ph}}" required>
+        </div>
+        <button type="submit">Submit</button>
+        <a href='{% url "user_details" %}'><button type="button">Back</button></a>
+    </form>
+
+   
+  </div>
+</div>
+
+
+{% endblock %}

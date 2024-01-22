@@ -19,8 +19,9 @@
                     <a href="#">Acoount</a>
                     <ul class="dropdown">
                         {% if user.is_authenticated %}
-                        <li><a href="elements.html">My Details</a></li>
-                        <li><a href="#">Change Password</a></li>
+                        <li><a href="{% url 'order' %}">My Order</a></li>
+                        <li><a href="{% url 'change_password' %}">Change Password</a></li>
+                        <li><a href="{% url 'user_details' %}">My Detail</a></li>
                         <li><a href="{% url 'Logout' %}">Logout</a></li>
                         {% else %}
                         <li><a href="{% url 'Login' %}">Login</a></li>
