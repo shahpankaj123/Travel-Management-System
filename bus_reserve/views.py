@@ -1,14 +1,25 @@
-# from django.views.generic import View
-from django.views import View
-from django.urls import reverse
-from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
-from datetime import datetime
+#external
 import json
-
 import string
 from random import choices
+from datetime import datetime
 
-from .models import Bus, BusSchedule, LOCATIONS, Seat #Ticket
+#django
+from django.views import View
+from django.urls import reverse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse
+
+#internal
+from .models import (
+    Bus,
+    BusSchedule,
+    LOCATIONS,
+    Seat, 
+    Ticket,
+    TicketHistory,
+    TicketOrder,
+    TransactionTable)
 
 
 def get_ticket_num():
@@ -77,43 +88,21 @@ class BookView(View):
     
     def post(self, request, bsid):
         seats = json.loads(request.body.decode('UTF-8'))
+        # to be replaced with actual transcation id
+        t = TransactionTable(pk='b40f4678-676a-4e28-892d-389715453981')
+        
+        tik_h = TicketOrder.objects.create(
+            transaction_id = t,
+            user_id = request.user,
+            quantity = len(seats['selectedSeats'])
+        )
+        tik_h.save()
 
         for sid in seats['selectedSeats']:
-            tik = Seat.objects.get(pk=sid)
-
-            tik.is_free = False
+            tik = Ticket.objects.get(seat_id=sid)
+            tik.seat_id.is_free = False
+            tik.seat_id.save()
+            tik_h.ticket_id.add(tik)
             tik.save()
-
-        print(seats)
-        return HttpResponse("lol")
-
-
-# class BookView(View):
-#     def get(self, request):
-#         # ticket = get_object_or_404(Ticket, pk=tid)
-#         # return render(request, 'book.html', {'ticket':ticket})
-#         return HttpResponse("All  good")
-
-#     def post(self, request):
-#         seat_ids = request.POST.get('seat_ids')
-#         seat_ids = json.loads(seat_ids)
-
-#         for seat in seat_ids:
-#             p_name = seat['name']
-#             p_num = seat['phone']
-
-#             st = Seat.objects.get(pk=seat['seat_id'])
-
-#             tk = Ticket.objects.get(seat_id=st)
-            
-#             st.is_free = False
-#             st.save()
-
-#             TicketOrder.objects.create(
-#                 user_id = request.user,
-#                 passenger_name = p_name,
-#                 passenger_phone = p_num,
-#                 transaction_id = "sth",
-#                 ticket_id = tk 
-#             )
     
+        return HttpResponse(status=200)
