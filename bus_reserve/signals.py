@@ -48,4 +48,3 @@ def populate_tickets(sender, instance=None, created=False, **kwargs):
         for seat in seats:
             ins = Ticket(ticket_num=get_ticket_num(), schedule_id=instance, seat_id=seat)
             ins.save()
-

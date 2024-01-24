@@ -1,22 +1,30 @@
 {% extends 'setup/base.html' %}
 
-
-
 {% block content %}
 <style>
     /* Updated styles for a more visually appealing design */
     .grid-container {
         display: grid;
-        grid-template-columns: repeat(3, 1fr); /* 3 columns of equal width */
-        gap: 10px; /* 10px gap between items */
+        grid-template-columns: repeat(2, 1fr);
+        gap: 5px;
         justify-items: center;
-        margin: 20px;
+        margin: 5px;
+    }
+
+    .grid-container > .grid-row:nth-child(2n) {
+        margin-left: -10%;
+    }
+
+    .grid-row {
+        display: flex;
+        gap: 5px;
+        justify-content: center;
     }
 
     .grid-item {
         position: relative;
-        width: 100px;
-        height: 100px;
+        width: 80px; /* Adjust the width as needed */
+        height: 80px; /* Adjust the height as needed */
         background-color: #ddd;
         border: 1px solid #888;
         display: flex;
@@ -29,23 +37,25 @@
     .seat-number {
         font-size: 18px;
         margin-bottom: 5px;
+        display: none; /* Initially hide seat numbers */
     }
 
-    /* Style the selected seats */
+    .grid-item:hover .seat-number {
+        display: block; /* Display seat number on hover */
+    }
+
     .seat-selected {
         background-color: green;
         color: white;
     }
 
-    /* Style the booked seats */
     .seat-booked {
         background-color: red;
         color: white;
         cursor: not-allowed;
     }
 
-    /* Style the Submit button */
-    #submit {
+    #submit-left {
         margin-top: 20px;
         padding: 10px 20px;
         background-color: #007BFF;
@@ -55,54 +65,126 @@
         cursor: pointer;
     }
 
-    #submit:hover {
+    #submit-left:hover {
         background-color: #0056b3;
+    }
+
+    #submit-right {
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    #submit-right:hover {
+        background-color: #0056b3;
+    }
+
+    .selected-seats-container {
+        background-color: #f5f5f5;
+        padding: 20px;
+        border-radius: 5px;
+        margin-top: 20px;
     }
 </style>
 
-<h1>Bus Seats Selection Menu</h1>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 {% csrf_token %}
-<div class="grid-container">
-    {% for seat in seats %}
-        {% if seat.is_free %}
-            <div class="grid-item seat-available" id="{{ seat.number }}" onclick="toggleSeat(this)">
-                <div class="seat-number">{{ seat.number }}</div>
-                <p class="seat-id" hidden="True">{{seat.id}}</p>
-                <div class="custom-checkbox">&#10003;</div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="grid-container">
+                {% for st in tickets %}
+                    <div class="grid-row">
+                        {% for ticket in st %}
+                            {% if ticket.seat_id.is_free %}
+                            <div class="grid-item seat-available" id="{{ ticket.seat_id.number }}" onclick="toggleSeat(this)">
+                                <i class="fas fa-chair fa-2x"></i>
+                                <p class="seat-number">{{ ticket.seat_id.number }}</p>
+                                <p class="seat-id" hidden="True">{{ ticket.id }}</p>
+                                <p class="seat-price" hidden="True">{{ ticket.schedule_id.route_id.price }}</p>
+                            </div>
+                            {% else %}
+                            <div class="grid-item seat-booked" id="{{ ticket.seat_id.number }}">
+                                <i class="fas fa-chair fa-2x"></i>
+                                <p class="seat-number">{{ ticket.seat_id.number }}</p>
+                                <p class="seat-id" hidden="True">{{ ticket.id }}</p>
+                                <p class="seat-price" hidden="True">{{ ticket.schedule_id.route_id.price }}</p>
+                            </div> 
+                            {% endif %}
+
+                        {% endfor %}
+                    </div>
+                {% endfor %}
             </div>
-        {% else %}
-            <div class="grid-item seat-booked" id="{{ seat.number }}">
-                <div class="seat-number">{{ seat.number }}</div>
-                <p class="seat-id" hidden="True">{{seat.id}}</p>
-                <div class="custom-checkbox">&#10003;</div>
+        </div>
+        <div class="col-md-6">
+            <!-- Right side content goes here -->
+            <div id="selected-seats-container" class="selected-seats-container">
+                <!-- Display selected seats, prices, and subtotal here -->
             </div>
-        {% endif %}
-    {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Create a button to submit the selected seats on the left side -->
+    <div class="row">
+        <div class="col-md-12">
+            <button id="submit-left" onclick="submitSeatsLeft()">Submit</button>
+        </div>
+    </div>
 </div>
-<!-- Create a button to submit the selected seats -->
-<button id="submit" onclick="submitSeats()">Submit</button>
+
 <script>
     function toggleSeat(seatElement) {
         seatElement.classList.toggle("seat-selected");
+        updateSelectedSeats();
     }
 
-    function submitSeats() {
+    function updateSelectedSeats() {
+        // Retrieve selected seats and their prices
+        var selectedSeats = document.querySelectorAll(".seat-selected");
+        var selectedSeatNumbers = Array.from(selectedSeats).map(function(seat) {
+            return seat.querySelector(".seat-number").innerText;
+        });
+        var selectedSeatPrices = Array.from(selectedSeats).map(function(seat) {
+            return parseFloat(seat.querySelector(".seat-price").innerText);
+        });
+
+        // Display selected seats, prices, and subtotal in the right side container
+        var selectedSeatsContainer = document.getElementById("selected-seats-container");
+        selectedSeatsContainer.innerHTML = "<h3>Selected Seats:</h3><ul>";
+        selectedSeatNumbers.forEach(function(seatNumber, index) {
+            selectedSeatsContainer.innerHTML += "<li>" + seatNumber + " - $" + selectedSeatPrices[index].toFixed(2) + "</li>";
+        });
+        selectedSeatsContainer.innerHTML += "</ul>";
+
+        // Calculate and display the subtotal
+        var subtotal = selectedSeatPrices.reduce(function(acc, price) {
+            return acc + price;
+        }, 0);
+        selectedSeatsContainer.innerHTML += "<h4>Subtotal: $" + subtotal.toFixed(2) + "</h4>";
+    }
+
+    function submitSeatsLeft() {
+        // Logic to submit seats on the left side
         var selectedSeats = document.querySelectorAll(".seat-selected");
         var selectedSeatNumbers = Array.from(selectedSeats).map(function(seat) {
             return seat.querySelector(".seat-id").innerText;
         });
-        
+
         var postData = {
             selectedSeats: selectedSeatNumbers
         };
 
         var csrftoken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
-      
+
         // Create a new XMLHttpRequest object
         var xhr = new XMLHttpRequest();
 
-
-        // Configure it for a POST request to 'http://localhost/test'
+        // Configure it for a POST request to the server
         xhr.open('POST', window.location.href, true);
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.setRequestHeader("X-CSRFToken", csrftoken);
@@ -110,23 +192,22 @@
         // Define the callback function to handle the response
         xhr.onload = function() {
             if (xhr.status >= 200 && xhr.status < 300) {
+                var responseJson = JSON.parse(xhr.responseText);
                 console.log('Success:', xhr.responseText);
-                window.location.reload()
+                console.log(responseJson)
+                window.location.href = responseJson.payment_url;
             } else {
                 console.error('Request failed with status:', xhr.status);
+                // You can handle the error response here
             }
         };
-
 
         // Convert the postData object to a JSON string and send it
         xhr.send(JSON.stringify(postData));
     }
-
-
 </script>
 
 {% endblock %}
-
 {% block footer %}
     {% include "setup/footer.html" %}
 {% endblock %}

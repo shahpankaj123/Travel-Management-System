@@ -1,0 +1,22 @@
+{
+    "return_url": "",
+    "website_url": "http://127.0.0.1:8000",
+    "amount": "",
+    "purchase_order_id": "",
+    "purchase_order_name": "ticket",
+    "customer_info": {
+        "name": "",
+        "email": "",
+        "phone": ""
+    },
+    "amount_breakdown": [],
+    "product_details": [
+        {
+            "name": "ticket",
+            "identity": "4",
+            "total_price": "",
+            "quantity": "",
+            "unit_price": ""
+        }
+    ]
+  }

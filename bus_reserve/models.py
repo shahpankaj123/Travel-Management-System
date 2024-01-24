@@ -53,9 +53,10 @@ class TicketOrder(models.Model):
     ticket_id = models.ManyToManyField(Ticket, blank=True)
     
 class TransactionTable(models.Model):
-    id = models.CharField(default=uuid4, primary_key=True, blank=True, max_length=200)
+    id = models.CharField(default=uuid4, primary_key=True, max_length=200)
     t_date = models.DateTimeField(auto_now_add=True)
     user_id = models.ForeignKey(User, on_delete=models.RESTRICT)
+    pdix = models.CharField(max_length=256, blank=True, null=True)
 
 class TicketHistory(models.Model):
     id = models.UUIDField(default=uuid4, primary_key=True, blank=True)

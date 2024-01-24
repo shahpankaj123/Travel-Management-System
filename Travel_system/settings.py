@@ -30,7 +30,10 @@ ALLOWED_HOSTS = []
 
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8000",
+    "https://test-pay.khalti.com"
 ]
+
+
 
 # Application definition
 
@@ -47,6 +50,8 @@ INSTALLED_APPS = [
     'bus_reserve',
 ]
 
+
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -57,6 +62,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'Travel_system.urls'
 
