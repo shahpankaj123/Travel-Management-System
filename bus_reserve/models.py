@@ -29,7 +29,7 @@ class Bus(models.Model):
 class BusSchedule(models.Model):
     id = models.UUIDField(default=uuid4, primary_key=True, blank=True)
     bus_id = models.OneToOneField(Bus, on_delete=models.CASCADE)
-    datetime = models.DateTimeField()
+    depart_date = models.DateTimeField()
     route_id = models.OneToOneField(Route, on_delete=models.CASCADE)
 
 class Seat(models.Model):
@@ -41,23 +41,35 @@ class Seat(models.Model):
 class Ticket(models.Model):
     id = models.UUIDField(default=uuid4, primary_key=True, blank=True)
     ticket_num = models.CharField(max_length=10)
-    is_bought = models.BooleanField(default=False, blank=True)
     schedule_id = models.ForeignKey(BusSchedule, on_delete=models.CASCADE)
-    seat_id = models.ForeignKey(Seat, on_delete=models.CASCADE)
+    seat_id = models.OneToOneField(Seat, on_delete=models.CASCADE)
 
 class TicketOrder(models.Model):
     id = models.UUIDField(default=uuid4, primary_key=True, blank=True)
+    user_id = models.ForeignKey(User, blank=True, on_delete=models.CASCADE)
+    transaction_id = models.ForeignKey('TransactionTable', blank=True,on_delete=models.CASCADE)
     bought_date = models.DateTimeField(auto_now_add=True)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    ticket_id = models.ForeignKey(Ticket, on_delete=models.CASCADE)
-
-class DepartInfo(models.Model):
-    id = models.UUIDField(default=uuid4, primary_key=True, blank=True)
-    user_arrived = models.BooleanField(default=False)
-    ticket_order_id = models.ForeignKey(TicketOrder, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1, blank=True)
+    ticket_id = models.ManyToManyField(Ticket, blank=True)
+    
+class TransactionTable(models.Model):
+    id = models.CharField(default=uuid4, primary_key=True, max_length=200)
+    t_date = models.DateTimeField(auto_now_add=True)
+    user_id = models.ForeignKey(User, on_delete=models.RESTRICT)
+    pdix = models.CharField(max_length=256, blank=True, null=True)
 
 class TicketHistory(models.Model):
     id = models.UUIDField(default=uuid4, primary_key=True, blank=True)
     cancelled = models.BooleanField(default=False, blank=True)
     refunded = models.BooleanField(default=False, blank=True)
-    depart_info_id = models.ForeignKey(DepartInfo, on_delete=models.CASCADE)
+    user_id = models.CharField(max_length=200, blank=True)
+    passenger = models.CharField(max_length=30)
+    phone = models.IntegerField(default=1, blank=True)
+    book_date = models.DateTimeField(blank=True)
+    depart_date = models.DateTimeField(blank=True)
+    depart_loc = models.CharField(max_length=30, blank=True)
+    arrive_loc = models.CharField(max_length=30, blank=True)
+    transaction_id = models.CharField(max_length=200, blank=True)
+    ticket_num = models.CharField(max_length=10, blank=True)
+    bus = models.ForeignKey(Bus, on_delete=models.RESTRICT, blank=True)
+    cost = models.IntegerField(default=1, blank=True)

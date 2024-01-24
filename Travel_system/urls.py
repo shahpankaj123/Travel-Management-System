@@ -23,8 +23,8 @@ from .views import Index,Contact,About,Services
 
 urlpatterns = [
     path('admin/', admin.site.urls, name='adminpannel'),
+    path("", include("bus_reserve.urls"), name="main"),
     path('user/',include('account.urls')),
-    path('',Index,name='home'),
     path('contact/',Contact,name='contact'),
     path('about/',About,name='about'),
     path('services/',Services,name='services')

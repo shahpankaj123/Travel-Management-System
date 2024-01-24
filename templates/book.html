@@ -1,0 +1,22 @@
+<!-- after user books the seat they are sent here -->
+
+{% extends 'base.html' %}
+{% block content %}
+
+    <h1>Ticket details</h1>
+    
+    <p>{{ticket.seat_id.number}}</p>
+    <p>{{ticket.ticket_num}}</p>
+    <p>{{ticket.schedule_id.datetime}}</p>
+    <p>{{ticket.schedule_id.route_id.price}}</p>
+    <p>{{ticket.schedule_id.route_id.arrive_loc}}</p>
+    <p>{{ticket.schedule_id.route_id.depart_loc}}</p>
+
+    <form method="POST" action="">
+        {% csrf_token %}
+        <button type="submit">Refund</button>
+    </form>
+
+    
+
+    {% endblock %}
