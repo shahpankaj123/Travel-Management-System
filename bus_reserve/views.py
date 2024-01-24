@@ -126,7 +126,7 @@ class BookView(View):
         headers = {
                 'Authorization': 'key 628f4ebcb93e41528b80678beea2ec83',
                 'Content-Type': 'application/json',
-            }
+        }
         
         url = "https://a.khalti.com/api/v2/epayment/initiate/"
         
@@ -152,3 +152,7 @@ class BookView(View):
         #     tik.seat_id.save()
         #     tik_h.ticket_id.add(tik)
         #     tik.save()
+
+class ConfirmView(View):
+    def get(self, request):
+        return render()
