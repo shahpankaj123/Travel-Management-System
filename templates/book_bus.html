@@ -175,6 +175,11 @@
             return seat.querySelector(".seat-id").innerText;
         });
 
+        if(selectedSeats.length < 1){
+            alert("Select at least one seat")
+            return
+        }
+
         var postData = {
             selectedSeats: selectedSeatNumbers
         };
@@ -185,7 +190,7 @@
         var xhr = new XMLHttpRequest();
 
         // Configure it for a POST request to the server
-        xhr.open('POST', window.location.href, true);
+        xhr.open('POST', window.location.href.split('?')[0], true);
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.setRequestHeader("X-CSRFToken", csrftoken);
 
@@ -195,6 +200,12 @@
                 var responseJson = JSON.parse(xhr.responseText);
                 console.log('Success:', xhr.responseText);
                 console.log(responseJson)
+
+                if(responseJson.message) {
+                    alert("select less than 4 seats");
+                    location.reload();
+                    return
+                }
                 window.location.href = responseJson.payment_url;
             } else {
                 console.error('Request failed with status:', xhr.status);
@@ -204,6 +215,13 @@
 
         // Convert the postData object to a JSON string and send it
         xhr.send(JSON.stringify(postData));
+
+        document.getElementById("submit-left").disabled = true;
+
+        // Enable the button after 5 seconds
+        setTimeout(function() {
+            document.getElementById("submit-left").disabled = false;
+        }, 5000);
     }
 </script>
 

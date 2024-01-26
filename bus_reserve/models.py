@@ -12,6 +12,11 @@ LOCATIONS = (
     ('7', 'Polkhara')
 )
 
+t_choices = (
+    ('1', 'Completed'),
+    ('2', 'Refunded')
+)
+
 class Route(models.Model):
     id = models.UUIDField(default=uuid4, primary_key=True, blank=True)
     depart_loc = models.CharField(max_length=20, choices=LOCATIONS, default='1')
@@ -48,15 +53,22 @@ class TicketOrder(models.Model):
     id = models.UUIDField(default=uuid4, primary_key=True, blank=True)
     user_id = models.ForeignKey(User, blank=True, on_delete=models.CASCADE)
     transaction_id = models.ForeignKey('TransactionTable', blank=True,on_delete=models.CASCADE)
-    bought_date = models.DateTimeField(auto_now_add=True)
+    bought_date = models.DateTimeField(auto_now=True)
     quantity = models.IntegerField(default=1, blank=True)
     ticket_id = models.ManyToManyField(Ticket, blank=True)
-    
+   # pending = models.BooleanField(default=True, blank=True, null=True)
+
+
 class TransactionTable(models.Model):
     id = models.CharField(default=uuid4, primary_key=True, max_length=200)
     t_date = models.DateTimeField(auto_now_add=True)
-    user_id = models.ForeignKey(User, on_delete=models.RESTRICT)
-    pdix = models.CharField(max_length=256, blank=True, null=True)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    phone = models.CharField(max_length=1, blank=True, null=True)
+    pidx = models.CharField(max_length=256, blank=True, null=True)
+    amount = models.IntegerField(default=100)
+    status = models.CharField(max_length=20, choices=t_choices, default='1')
+    khalti_tran_id = models.CharField(max_length=256, blank=True)
+    
 
 class TicketHistory(models.Model):
     id = models.UUIDField(default=uuid4, primary_key=True, blank=True)

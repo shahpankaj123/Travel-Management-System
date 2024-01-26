@@ -7,7 +7,9 @@ from .models import (
     Bus,
     BusSchedule,
     Seat,
-    Ticket
+    Ticket,
+    TicketOrder,
+    TransactionTable
 )
 
 def get_ticket_num():
@@ -48,3 +50,13 @@ def populate_tickets(sender, instance=None, created=False, **kwargs):
         for seat in seats:
             ins = Ticket(ticket_num=get_ticket_num(), schedule_id=instance, seat_id=seat)
             ins.save()
+
+@receiver(pre_delete, sender=TransactionTable)
+def update_seats(sender, instance=None, created=False, **kwargs):
+    tik_ord = TicketOrder.objects.get(transaction_id=instance)
+
+    for tik in tik_ord.ticket_id.all():
+        tik.seat_id.is_free = True
+        tik.seat_id.save()
+
+
