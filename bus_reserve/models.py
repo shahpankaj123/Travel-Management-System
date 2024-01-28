@@ -1,6 +1,8 @@
-from django.db import models
+import json
 from uuid import uuid4
+from django.db import models
 from account.models import User
+
 
 LOCATIONS = (
     ('1', 'Kathmandu'),
@@ -14,7 +16,8 @@ LOCATIONS = (
 
 t_choices = (
     ('1', 'Completed'),
-    ('2', 'Refunded')
+    ('2', 'Refunded'),
+    ('3', 'Cancelled')
 )
 
 class Route(models.Model):
@@ -63,7 +66,7 @@ class TransactionTable(models.Model):
     id = models.CharField(default=uuid4, primary_key=True, max_length=200)
     t_date = models.DateTimeField(auto_now_add=True)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    phone = models.CharField(max_length=1, blank=True, null=True)
+    phone = models.CharField(max_length=10, blank=True, null=True)
     pidx = models.CharField(max_length=256, blank=True, null=True)
     amount = models.IntegerField(default=100)
     status = models.CharField(max_length=20, choices=t_choices, default='1')
@@ -72,16 +75,12 @@ class TransactionTable(models.Model):
 
 class TicketHistory(models.Model):
     id = models.UUIDField(default=uuid4, primary_key=True, blank=True)
-    cancelled = models.BooleanField(default=False, blank=True)
-    refunded = models.BooleanField(default=False, blank=True)
-    user_id = models.CharField(max_length=200, blank=True)
-    passenger = models.CharField(max_length=30)
-    phone = models.IntegerField(default=1, blank=True)
-    book_date = models.DateTimeField(blank=True)
+    tran_id = models.ForeignKey(TransactionTable, blank=True,on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User, blank=True, on_delete=models.CASCADE)
+    ticket_number = models.CharField(max_length=25, blank=True)
+    seat_number = models.CharField(max_length=10, blank=True)
+    depart_loc = models.CharField(max_length=25, blank=True)
+    arrive_loc = models.CharField(max_length=25, blank=True)
+    price = models.IntegerField(default=100, blank=True)
     depart_date = models.DateTimeField(blank=True)
-    depart_loc = models.CharField(max_length=30, blank=True)
-    arrive_loc = models.CharField(max_length=30, blank=True)
-    transaction_id = models.CharField(max_length=200, blank=True)
-    ticket_num = models.CharField(max_length=10, blank=True)
-    bus = models.ForeignKey(Bus, on_delete=models.RESTRICT, blank=True)
-    cost = models.IntegerField(default=1, blank=True)
+    bus_model = models.CharField(max_length=25, blank=True)

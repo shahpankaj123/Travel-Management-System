@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'account',
     'bus_reserve',
+    'django_celery_beat',
 ]
 
 
@@ -64,6 +65,7 @@ MIDDLEWARE = [
 
 ]
 
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 ROOT_URLCONF = 'Travel_system.urls'
 
@@ -122,7 +124,7 @@ AUTH_USER_MODEL = "account.User"
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kathmandu'
 
 USE_I18N = True
 

@@ -7,27 +7,24 @@ from datetime import datetime, timezone
 #django
 from django.views import View
 from django.urls import reverse
-from django.db.models import Sum 
+from django.db.models import Sum
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse, HttpResponseForbidden
 
 #internal
-from .models import (
-    Bus,
-    BusSchedule,
-    LOCATIONS,
-    Seat, 
-    Ticket,
-    TicketHistory,
-    TicketOrder,
-    TransactionTable)
+from .models import BusSchedule, LOCATIONS, Ticket, TicketOrder, TransactionTable, Seat
+
+headers = {
+        'Authorization': 'key 628f4ebcb93e41528b80678beea2ec83',
+        'Content-Type': 'application/json',
+}
 
 # adds transaction details and books a ticket
 def add_ticket_order(request, tickets, pidx, p_id):
 
     k_t_id = request.GET.get('transaction_id')
-    amount = request.GET.get('amount')
+    amount = int(request.GET.get('amount'))/100
     mobile = request.GET.get('mobile')
     user_id = request.user
     qty = len(tickets)
@@ -48,12 +45,13 @@ def add_ticket_order(request, tickets, pidx, p_id):
     )
     
     tik.save()
+
+    tik_obj = Ticket.objects.filter(pk__in=tickets)
     
-    for ticket in tickets:
+    for ticket in tik_obj:
         tik.ticket_id.add(ticket)
-        tic = Ticket.objects.get(pk=ticket)
-        tic.seat_id.is_free = False
-        tic.seat_id.save()
+        ticket.seat_id.is_free = False
+        ticket.seat_id.save()
 
 # generates payload to post to khalti server
 def get_khalti_payload(request, price, qty):
@@ -120,9 +118,15 @@ class BusesView(View):
         else:
             buses = BusSchedule.objects.filter(
                 route_id__arrive_loc=arrive,
-                route_id__depart_loc=depart).select_related('bus_id', 'route_id')           
-
-        return render(request, 'buses.html', {'buses':buses})
+                route_id__depart_loc=depart).select_related('bus_id', 'route_id')
+        
+        seats = []
+        
+        for bus in buses:
+            reserved = Seat.objects.filter(bus_id=bus.bus_id, is_free=False).count()
+            seats.append(bus.bus_id.capacity-reserved)
+            
+        return render(request, 'buses.html', {'buses':zip(buses, seats)})
 
 
 class BookView(LoginRequiredMixin, View):
@@ -158,12 +162,17 @@ class BookView(LoginRequiredMixin, View):
         if pidx:
             resp = requests.post(
                                     "https://a.khalti.com/api/v2/epayment/lookup/",
-                                    data={'pidx':pidx}
+                                    data={'pidx':pidx},
                                 ).json()
             
             tickets = request.session.get('tickets')
 
-            if not TransactionTable.objects.filter(pk=purchase_order_id) and resp['status']=='Completed':
+            print(resp)
+
+            if 'detail' in resp:
+                return HttpResponse(resp['detail'])
+
+            elif not TransactionTable.objects.filter(pk=purchase_order_id) and resp['status']=='Completed':
                 add_ticket_order(request, tickets, pidx, purchase_order_id)
 
         
@@ -179,8 +188,11 @@ class BookView(LoginRequiredMixin, View):
         qty = len(tickets)
 
         db_qty = TicketOrder.objects.filter(user_id=request.user).aggregate(
-            db_qty = Sum('quantity')
-        )['db_qty']
+                                                    db_qty = Sum('quantity')
+                                                )['db_qty']
+
+        if not db_qty:
+            db_qty = 0
 
         if qty > 4 or db_qty+qty>4:
             return JsonResponse({'message':'max seats booked'})
@@ -191,10 +203,7 @@ class BookView(LoginRequiredMixin, View):
 
         price = tik.schedule_id.route_id.price        
 
-        headers = {
-                'Authorization': 'key 628f4ebcb93e41528b80678beea2ec83',
-                'Content-Type': 'application/json',
-        }
+
         
         url = "https://a.khalti.com/api/v2/epayment/initiate/"
 

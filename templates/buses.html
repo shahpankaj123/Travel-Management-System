@@ -9,7 +9,7 @@
 {% if buses %}
 
     <div class="list-group">
-        {% for bus in buses %}
+        {% for bus, av in buses %}
             <div class="list-group-item list-group-item-action">
                 <div class="d-flex w-100 justify-content-between">
                     <img src="{{ bus.bus_id.image }}" alt="{{ bus.bus_id.model }}" class="mr-3" style="max-width: 100px;">
@@ -17,7 +17,7 @@
                         <h5 class="mb-1">{{ bus.bus_id.model }}</h5>
                         <p class="mb-1">{{ bus.route_id.get_depart_loc_display }} &rarr; {{ bus.route_id.get_arrive_loc_display }}</p>
                         <p class="mb-1">Departure Time: {{ bus.depart_date|time:"H:i" }} | Departure Date: {{ bus.depart_date|date:"F j, Y" }}</p>
-                        <p class="mb-1">Total Seats: {{ bus.bus_id.capacity }} | Price: {{ bus.route_id.price }}</p>
+                        <p class="mb-1">Total Seats: {{ bus.bus_id.capacity }} | Available Seats : {{av}} | Price: {{ bus.route_id.price }}</p>
                     </div>
                     <a href="{% url 'book_bus' bus.id %}" class="btn btn-success btn-sm align-self-center">Book Now</a>
                 </div>
