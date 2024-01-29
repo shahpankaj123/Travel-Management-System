@@ -81,8 +81,8 @@ The Travel Management System is a web-based application built with Django, Celer
 
 ## Contributors
 
-- Anuj Bhattarai ([GitHub](https://github.com/anuj))
-- Pankaj Shah ([GitHub](https://github.com/pankaj))
+- Anuj Bhattarai ([GitHub](https://github.com/anuj66283))
+- Pankaj Shah ([GitHub](https://github.com/shahpankaj123))
 
 ## License
 
