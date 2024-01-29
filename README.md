@@ -93,7 +93,7 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 For any issues or inquiries, please contact the project maintainers:
 
 - Anuj Bhattarai: anuj@example.com
-- Pankaj Shah: pankaj@example.com
+- Pankaj Shah: pshah9360@gmail.com
 
 ## Acknowledgments
 
