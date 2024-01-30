@@ -1,5 +1,11 @@
 {% extends 'setup/base.html' %}
 
+{% block title %}Select seat{% endblock %}
+
+{% block header %}
+    {% include "setup/nav.html" %}
+{% endblock %}
+
 {% block content %}
 <style>
     /* Updated styles for a more visually appealing design */
@@ -55,21 +61,27 @@
         cursor: not-allowed;
     }
 
-    #submit-left {
-        margin-top: 20px;
-        padding: 10px 20px;
-        background-color: #007BFF;
-        color: white;
-        border: none;
+    #selected-seats-container {
+        background-color: #f5f5f5;
+        padding: 20px;
         border-radius: 5px;
-        cursor: pointer;
+        margin-top: 20px;
+        min-height: 200px; /* Adjust the minimum height as needed */
     }
 
-    #submit-left:hover {
-        background-color: #0056b3;
+    .selected-seats-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .selected-seat-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
     }
 
     #submit-right {
+        display: none;
         margin-top: 20px;
         padding: 10px 20px;
         background-color: #007BFF;
@@ -83,39 +95,41 @@
         background-color: #0056b3;
     }
 
-    .selected-seats-container {
-        background-color: #f5f5f5;
-        padding: 20px;
-        border-radius: 5px;
+    .no-selected-seats-msg {
         margin-top: 20px;
+        color: #666;
     }
 </style>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
 {% csrf_token %}
-<div class="container-fluid">
-    <div class="row">
+<div class="container-fluid mt-5">
+    <div class="row mt-3">
         <div class="col-md-6">
+            <div class="d-flex justify-content-center align-items-center">
+                <h3>Select seats</h3>
+            </div>
             <div class="grid-container">
+                
                 {% for st in tickets %}
                     <div class="grid-row">
                         {% for ticket in st %}
                             {% if ticket.seat_id.is_free %}
-                            <div class="grid-item seat-available" id="{{ ticket.seat_id.number }}" onclick="toggleSeat(this)">
-                                <i class="fas fa-chair fa-2x"></i>
-                                <p class="seat-number">{{ ticket.seat_id.number }}</p>
-                                <p class="seat-id" hidden="True">{{ ticket.id }}</p>
-                                <p class="seat-price" hidden="True">{{ ticket.schedule_id.route_id.price }}</p>
-                            </div>
+                                <div class="grid-item seat-available" id="{{ ticket.seat_id.number }}" onclick="toggleSeat(this)">
+                                    <i class="fas fa-chair fa-2x"></i>
+                                    <p class="seat-number">{{ ticket.seat_id.number }}</p>
+                                    <p class="seat-id" hidden="True">{{ ticket.id }}</p>
+                                    <p class="seat-price" hidden="True">{{ ticket.schedule_id.route_id.price }}</p>
+                                </div>
                             {% else %}
-                            <div class="grid-item seat-booked" id="{{ ticket.seat_id.number }}">
-                                <i class="fas fa-chair fa-2x"></i>
-                                <p class="seat-number">{{ ticket.seat_id.number }}</p>
-                                <p class="seat-id" hidden="True">{{ ticket.id }}</p>
-                                <p class="seat-price" hidden="True">{{ ticket.schedule_id.route_id.price }}</p>
-                            </div> 
+                                <div class="grid-item seat-booked" id="{{ ticket.seat_id.number }}">
+                                    <i class="fas fa-chair fa-2x"></i>
+                                    <p class="seat-number">{{ ticket.seat_id.number }}</p>
+                                    <p class="seat-id" hidden="True">{{ ticket.id }}</p>
+                                    <p class="seat-price" hidden="True">{{ ticket.schedule_id.route_id.price }}</p>
+                                </div> 
                             {% endif %}
-
                         {% endfor %}
                     </div>
                 {% endfor %}
@@ -124,60 +138,71 @@
         <div class="col-md-6">
             <!-- Right side content goes here -->
             <div id="selected-seats-container" class="selected-seats-container">
-                <!-- Display selected seats, prices, and subtotal here -->
+                <h3 class="mb-3">Selected Seats:</h3>
+                <ul id="selected-seats-list" class="list-group">
+                    <!-- Display selected seats dynamically here -->
+                </ul>
+                <div id="subtotal-container" class="mt-4">
+                    <h4>Subtotal: Rs <span id="subtotal">0.00</span></h4>
+                </div>
+                <button id="submit-left" onclick="submitSeatsRight()" class="btn btn-primary mt-4" style="display: none;">Submit</button>
             </div>
-        </div>
-    </div>
-    
-    <!-- Create a button to submit the selected seats on the left side -->
-    <div class="row">
-        <div class="col-md-12">
-            <button id="submit-left" onclick="submitSeatsLeft()">Submit</button>
         </div>
     </div>
 </div>
 
 <script>
-    function toggleSeat(seatElement) {
-        seatElement.classList.toggle("seat-selected");
-        updateSelectedSeats();
+ function toggleSeat(seatElement) {
+    seatElement.classList.toggle("seat-selected");
+    updateSelectedSeats();
+}
+
+function updateSelectedSeats() {
+    var selectedSeats = document.querySelectorAll(".seat-selected");
+    var selectedSeatsList = document.getElementById("selected-seats-list");
+    var subtotalContainer = document.getElementById("subtotal-container");
+    var subtotalElement = document.getElementById("subtotal");
+
+    // Clear previous content
+    selectedSeatsList.innerHTML = "";
+
+    // Display selected seats dynamically
+    selectedSeats.forEach(function(seat) {
+        var seatNumber = seat.querySelector(".seat-number").innerText;
+        var seatPrice = parseFloat(seat.querySelector(".seat-price").innerText).toFixed(2);
+
+        // Create list item for each selected seat
+        var listItem = document.createElement("li");
+        listItem.className = "list-group-item d-flex justify-content-between align-items-center";
+        listItem.innerHTML = `${seatNumber} - Rs ${seatPrice}`;
+        selectedSeatsList.appendChild(listItem);
+    });
+
+    // Calculate and display the subtotal
+    var subtotal = Array.from(selectedSeats).reduce(function(acc, seat) {
+        return acc + parseFloat(seat.querySelector(".seat-price").innerText);
+    }, 0).toFixed(2);
+    subtotalElement.innerText = subtotal;
+
+    // Show or hide the submit button based on selected seats
+    var submitButton = document.getElementById("submit-left");
+    if (selectedSeats.length > 0) {
+        submitButton.style.display = "block";
+    } else {
+        submitButton.style.display = "none";
     }
+} 
 
-    function updateSelectedSeats() {
-        // Retrieve selected seats and their prices
-        var selectedSeats = document.querySelectorAll(".seat-selected");
-        var selectedSeatNumbers = Array.from(selectedSeats).map(function(seat) {
-            return seat.querySelector(".seat-number").innerText;
-        });
-        var selectedSeatPrices = Array.from(selectedSeats).map(function(seat) {
-            return parseFloat(seat.querySelector(".seat-price").innerText);
-        });
-
-        // Display selected seats, prices, and subtotal in the right side container
-        var selectedSeatsContainer = document.getElementById("selected-seats-container");
-        selectedSeatsContainer.innerHTML = "<h3>Selected Seats:</h3><ul>";
-        selectedSeatNumbers.forEach(function(seatNumber, index) {
-            selectedSeatsContainer.innerHTML += "<li>" + seatNumber + " - $" + selectedSeatPrices[index].toFixed(2) + "</li>";
-        });
-        selectedSeatsContainer.innerHTML += "</ul>";
-
-        // Calculate and display the subtotal
-        var subtotal = selectedSeatPrices.reduce(function(acc, price) {
-            return acc + price;
-        }, 0);
-        selectedSeatsContainer.innerHTML += "<h4>Subtotal: $" + subtotal.toFixed(2) + "</h4>";
-    }
-
-    function submitSeatsLeft() {
-        // Logic to submit seats on the left side
+    function submitSeatsRight() {
+        // Logic to submit seats on the right side
         var selectedSeats = document.querySelectorAll(".seat-selected");
         var selectedSeatNumbers = Array.from(selectedSeats).map(function(seat) {
             return seat.querySelector(".seat-id").innerText;
         });
 
-        if(selectedSeats.length < 1){
-            alert("Select at least one seat")
-            return
+        if (selectedSeats.length < 1) {
+            alert("Select at least one seat");
+            return;
         }
 
         var postData = {
@@ -199,12 +224,12 @@
             if (xhr.status >= 200 && xhr.status < 300) {
                 var responseJson = JSON.parse(xhr.responseText);
                 console.log('Success:', xhr.responseText);
-                console.log(responseJson)
+                console.log(responseJson);
 
-                if(responseJson.message) {
-                    alert("select less than 4 seats");
+                if (responseJson.message) {
+                    alert("Select less than 4 seats");
                     location.reload();
-                    return
+                    return;
                 }
                 window.location.href = responseJson.payment_url;
             } else {
@@ -216,16 +241,17 @@
         // Convert the postData object to a JSON string and send it
         xhr.send(JSON.stringify(postData));
 
-        document.getElementById("submit-left").disabled = true;
+        document.getElementById("submit-right").disabled = true;
 
         // Enable the button after 5 seconds
         setTimeout(function() {
-            document.getElementById("submit-left").disabled = false;
+            document.getElementById("submit-right").disabled = false;
         }, 5000);
     }
 </script>
 
 {% endblock %}
+
 {% block footer %}
     {% include "setup/footer.html" %}
 {% endblock %}

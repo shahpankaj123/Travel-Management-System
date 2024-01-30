@@ -4,6 +4,13 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.conf import settings
 from django.core.mail import send_mail
+from io import BytesIO
+from django.template.loader import get_template
+from django.http import HttpResponse
+from xhtml2pdf import pisa
+from django.core.mail import EmailMessage
+
+from bus_reserve.models import TicketOrder
 
 @shared_task
 def send_activation_email(recipient_email, activation_url):
@@ -27,4 +34,34 @@ def send_mail_verify(email,token,token1):
     email.attach_alternative(html_content, "text/html")
     email.send()
  
-   
+@shared_task
+def Send_ticket(request):
+    orders = TicketOrder.objects.filter(user_id=request[0])
+
+    template = get_template('account/ticket.html')
+    html_content = template.render({'context': orders})
+
+    pdf_data = BytesIO()
+    
+    pisa.CreatePDF(html_content, dest=pdf_data)
+
+    response = HttpResponse(pdf_data.getvalue(), content_type='application/pdf')
+    response['Content-Disposition'] = 'filename="document.pdf"'
+
+    subject = 'PDF Attachment'
+    message = 'Please find the attached PDF document.'
+    from_email = settings.EMAIL_HOST_USER
+    to_email = request[1]
+
+    email = EmailMessage(subject, message, from_email, [to_email])
+    email.attach('document.pdf', response.content, 'application/pdf')
+    email.send()
+
+@shared_task
+def send_refund_mail(tik_id):
+    subject = 'Refund request'
+    message = f'Ticket id {tik_id} is asking for refund'
+    from_email = settings.EMAIL_HOST_USER
+    to_email = 'aasd03434@gmail.com'
+
+    EmailMessage(subject, message, from_email, [to_email]).send()

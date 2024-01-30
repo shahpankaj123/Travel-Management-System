@@ -23,7 +23,7 @@
 									<div class="row mb-2">
 										<div class="col-sm-12 col-md-6 mb-3 mb-lg-0 col-lg-4">
 											<select name="depart" id="" class="form-control custom-select">
-												{% for loc in locations %}
+												{% for loc in depart_loc %}
 													<option value="{{loc.0}}">{{loc.1}}</option>
 												{% endfor %}
 											</select>
@@ -31,7 +31,7 @@
 
 										<div class="col-sm-12 col-md-6 mb-3 mb-lg-0 col-lg-4">
 											<select name="arrive" id="" class="form-control custom-select">
-												{% for loc in locations %}
+												{% for loc in arrive_loc %}
 													<option value="{{loc.0}}">{{loc.1}}</option>
 												{% endfor %}
 											</select>

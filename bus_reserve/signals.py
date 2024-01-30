@@ -2,7 +2,7 @@ import json
 import string
 from random import choices
 from django.dispatch import receiver
-from django.db.models.signals import post_save, pre_delete
+from django.db.models.signals import post_save, pre_delete, post_delete
 from django_celery_beat.models import IntervalSchedule, PeriodicTask
 
 from .models import (
@@ -46,7 +46,7 @@ def clean_images(sender, instance=None, **kwargs):
 def populate_tickets(sender, instance=None, created=False, **kwargs):
     if created:
         seats = Seat.objects.filter(bus_id=instance.bus_id)
-
+        print("creaed signal")
         Ticket.objects.bulk_create(
             [Ticket(ticket_num=get_ticket_num(),
                    schedule_id=instance,
@@ -65,14 +65,20 @@ def populate_tickets(sender, instance=None, created=False, **kwargs):
                                     args=json.dumps([str(instance.id)]),
                                     start_time=instance.depart_date
                                 )
+        
+        return 1
+
+    tsk = PeriodicTask.objects.get(name=str(instance.id))
+    tsk.start_time = instance.depart_date
+    tsk.save()
 
 @receiver(pre_delete, sender=BusSchedule)
 def populate_ticket_history(sender, instance=None, created=False, **kwargs):
     tik_ords = TicketOrder.objects.filter(ticket_id__schedule_id=instance.id\
                                          ).distinct()
     
-    depart_loc = instance.route_id.depart_loc
-    arrive_loc = instance.route_id.arrive_loc
+    depart_loc = instance.route_id.get_depart_loc_display()
+    arrive_loc = instance.route_id.get_arrive_loc_display()
     depart_d = instance.depart_date
     bus_model = instance.bus_id.model
 
@@ -97,4 +103,7 @@ def populate_ticket_history(sender, instance=None, created=False, **kwargs):
         )
         tik_ord.delete()
     
-    
+@receiver(post_delete, sender=BusSchedule)
+def populate_ticket_history(sender, instance=None, created=False, **kwargs):
+    tsk = PeriodicTask.objects.get(name=str(instance.id))
+    tsk.interval.delete()

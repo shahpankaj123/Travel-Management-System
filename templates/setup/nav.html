@@ -16,7 +16,7 @@
             <ul class="js-clone-nav d-none d-lg-inline-block text-left site-menu float-right">
                 <li class="active"><a href="{% url 'home'  %}">Home</a></li>
                 <li class="has-children">
-                    <a href="#">Acoount</a>
+                    <a href="#">Account</a>
                     <ul class="dropdown">
                         {% if user.is_authenticated %}
                         <li><a href="{% url 'order' %}">My Order</a></li>

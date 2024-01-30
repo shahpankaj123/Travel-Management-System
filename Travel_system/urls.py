@@ -18,7 +18,7 @@ from django.conf.urls.static import static
 from django.conf import settings
 from django.contrib import admin
 from django.urls import path,include
-from .views import Index,Contact,About,Services
+from .views import Contact,About,Services
 
 
 urlpatterns = [

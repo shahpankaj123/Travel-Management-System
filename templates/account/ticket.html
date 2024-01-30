@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invoice</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+
+    .invoice {
+      width: 80%;
+      margin: 20px auto;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    header, main, footer {
+      padding: 20px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    header {
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      padding-bottom: 40px;
+    }
+
+    main {
+      padding-bottom: 40px;
+    }
+
+    h1 {
+      margin: 0;
+    }
+
+    .bill-to {
+      margin-top: 20px;
+      margin-bottom: 40px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 15px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    .total {
+      float: right;
+      margin-top: 20px;
+    }
+
+    footer {
+      text-align: right;
+    }
+
+    footer p {
+      margin: 0;
+    }
+
+    @media print {
+      body {
+        background-color: #fff;
+      }
+
+      .invoice {
+        box-shadow: none;
+        border: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="invoice">
+    <header>
+      <h1>Invoice</h1>
+    </header>
+
+    <main>
+      <div class="bill-to">
+        <p><strong>Bill To:</strong></p>
+        <p>Customer Name: {{context.user_id.username}}</p>
+        <p>Customer Address</p>
+        <p>Country: Nepal</p>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Ticket No</th>
+            <th>Seat No</th>
+            <th>Price</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for orders in context %}
+              {% for ticket in orders.ticket_id.all %}
+                <tr>
+                  <td>{{ticket.ticket_num}}</td>
+                  <td>{{ticket.seat_id.number}}</td>
+                  <td>{{ticket.schedule_id.route_id.price}}</td>
+                </tr>
+                {% endfor %}
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="total">
+        <p><strong>Total:</strong> $35.00</p>
+        <p>Payment Due: January 31, 2024</p>
+      </div>
+    </main>
+
+    <footer>
+      <p>Thank you for your business!</p>
+    </footer>
+  </div>
+
+</body>
+</html>
+
+

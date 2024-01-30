@@ -1,38 +1,61 @@
-<!-- after searching for bus user is redirected here -->
+<style>
+    .list-group-item {
+        background-color: #f8f9fa; /* Light grey background */
+        border: 1px solid #dee2e6; /* Border color */
+    }
 
+    .list-group-item:hover {
+        background-color: #e2e6ea; /* Darker grey background on hover */
+    }
+
+    .list-group-item img {
+        border-radius: 5px; /* Rounded corners for images */
+    }
+
+    .list-group-item a {
+        transition: background-color 0.3s; /* Smooth transition for the "Book Now" button */
+    }
+
+    .list-group-item a:hover {
+        background-color: #28a745; /* Green background on button hover */
+    }
+</style>
+
+<!-- after searching for bus user is redirected here -->
 {% extends 'setup/base.html' %}
 
+{% block title %}Book bus{% endblock %}
 
-{% block content %}
-
-
-{% if buses %}
-
-    <div class="list-group">
-        {% for bus, av in buses %}
-            <div class="list-group-item list-group-item-action">
-                <div class="d-flex w-100 justify-content-between">
-                    <img src="{{ bus.bus_id.image }}" alt="{{ bus.bus_id.model }}" class="mr-3" style="max-width: 100px;">
-                    <div class="flex-grow-1 ml-3">
-                        <h5 class="mb-1">{{ bus.bus_id.model }}</h5>
-                        <p class="mb-1">{{ bus.route_id.get_depart_loc_display }} &rarr; {{ bus.route_id.get_arrive_loc_display }}</p>
-                        <p class="mb-1">Departure Time: {{ bus.depart_date|time:"H:i" }} | Departure Date: {{ bus.depart_date|date:"F j, Y" }}</p>
-                        <p class="mb-1">Total Seats: {{ bus.bus_id.capacity }} | Available Seats : {{av}} | Price: {{ bus.route_id.price }}</p>
-                    </div>
-                    <a href="{% url 'book_bus' bus.id %}" class="btn btn-success btn-sm align-self-center">Book Now</a>
-                </div>
-            </div>
-        {% endfor %}
-    </div>
-{% else %}
-    <p class="mt-3">No buses found for your search.</p>
-{% endif %}
-
-
+{% block header %}
+    {% include "setup/nav.html" %}
 {% endblock %}
 
-{%block footer %}
+{% block content %}
+    <div class="container mt-5">
+        {% if buses %}
+            <div class="list-group">
+                {% for bus, av in buses %}
+                    <div class="list-group-item mt-3 list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <img src="/media/{{ bus.bus_id.image }}" alt="{{ bus.bus_id.model }}" class="mr-3" style="max-width: 100px;">
+                            <div class="flex-grow-1 ml-3">
+                                <h5 class="mb-1">{{ bus.bus_id.model }}</h5>
+                                <p class="mb-1">{{ bus.route_id.get_depart_loc_display }} &rarr; {{ bus.route_id.get_arrive_loc_display }}</p>
+                                <p class="mb-1">Departure Time: {{ bus.depart_date|time:"H:i" }} | Departure Date: {{ bus.depart_date|date:"F j, Y" }}</p>
+                                <p class="mb-1">Total Seats: {{ bus.bus_id.capacity }} | Available Seats : {{ av }} | Price: {{ bus.route_id.price }}</p>
+                            </div>
+                            <a href="{% url 'book_bus' bus.id %}" class="btn btn-success btn-sm align-self-center">Book Now</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+            <p class="mt-3">No buses found for your search.</p>
+        {% endif %}
+    </div>
+{% endblock %}
 
-{% include "setup/footer.html" %}
-
+{% block footer %}
+    {% include "setup/footer.html" %}
 {% endblock %}

@@ -15,9 +15,57 @@ body {
 <div class="hero">
     <div class="container">
         
-    <h2 class="mb-4">My Order</h2>
+    
+      <h2 class="mb-4">Pending Orders</h2>
+    {% if pending_tickets %}
+   
+      <table class="table table-bordered table-striped">
+        <thead>
+          <tr>
+              <tr>
+                  <th>Order ID</th>
+                  <th>Bought Date</th>
+                  <th>Ticket Number</th>
+                  <th>Departure Time</th>
+                  <th>Departure Location</th>
+                  <th>Arrival Location</th>
+                  <th>Bus Model</th>
+                  <th>Seat Number</th>
+                </tr>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in pending_tickets %}
+            {% for ticket in order.ticket_id.all %}
+              <tr>
+                <td>{{ order.id }}</td>
+                <td>{{ order.transaction_id.t_date }}</td>
+                <td>{{ ticket.ticket_num }}</td>
+                <td>{{ ticket.schedule_id.depart_date }}</td>
+                <td>{{ ticket.schedule_id.route_id.get_depart_loc_display }}</td>
+                <td>{{ ticket.schedule_id.route_id.get_arrive_loc_display }}</td>
+                <td>{{ ticket.schedule_id.bus_id.model }}</td>
+                <td>{{ ticket.seat_id.number }}</td>
+                
+                <form method="post" action="{% url 'order' %}">
+                  {% csrf_token %}
+                  <input hidden="true" name="tik_id" type="text" value="{{ticket.id}}">
+                  <td><input type="submit"></td>
+                </form>
 
+                
+              </tr>
+            {% endfor %}
+        {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+        <h4>No peding orders found for this user.</h4>
+      {% endif %}
+
+    <h2 class="mb-4">My Order</h2>
     {% if ticket_orders %}
+    
     <table class="table table-bordered table-striped">
       <thead>
         <tr>
@@ -34,18 +82,18 @@ body {
         </tr>
       </thead>
       <tbody>
-         {% for order in ticket_orders %}
-        <tr>
-          <td>{{ order.id }}</td>
-          <td>{{ order.bought_date }}</td>
-          <td>{{ order.ticket_id.ticket_num }}</td>
-          <td>{{ order.ticket_id.schedule_id.datetime }}</td>
-          <td>{{ order.ticket_id.schedule_id.route_id.get_depart_loc_display }}</td>
-          <td>{{ order.ticket_id.schedule_id.route_id.get_arrive_loc_display }}</td>
-          <td>{{ order.ticket_id.schedule_id.bus_id.model }}</td>
-          <td>{{ order.ticket_id.seat_id.number }}</td>
-        </tr>
-      {% endfor %}
+        {% for order in ticket_orders %}
+          <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.tran_id.t_date }}</td>
+            <td>{{ order.ticket_number }}</td>
+            <td>{{ order.depart_date }}</td>
+            <td>{{ order.depart_loc }}</td>
+            <td>{{ order.arrive_loc }}</td>
+            <td>{{ order.bus_model }}</td>
+            <td>{{ order.seat_number }}</td>
+          </tr>
+        {% endfor %}
       </tbody>
     </table>
     {% else %}

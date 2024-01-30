@@ -2,21 +2,23 @@
 import json
 import requests
 from uuid import uuid4
-from datetime import datetime, timezone
+from datetime import datetime
+
 
 #django
 from django.views import View
-from django.urls import reverse
 from django.db.models import Sum
+from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse, HttpResponseForbidden
 
 #internal
-from .models import BusSchedule, LOCATIONS, Ticket, TicketOrder, TransactionTable, Seat
+from account.tasks import Send_ticket
+from .models import BusSchedule, LOCATIONS, Ticket, TicketOrder, TransactionTable, Seat, Route
 
 headers = {
-        'Authorization': 'key 628f4ebcb93e41528b80678beea2ec83',
+        'Authorization': 'key a4c85df6a34f476fb958c71daf37d1be',
         'Content-Type': 'application/json',
 }
 
@@ -86,7 +88,13 @@ class HomeView(View):
 
     """
     def get(self, request):
-        return render(request, "index.html", {'locations':LOCATIONS})
+        routes = Route.objects.all()
+
+        arrive_locs = set([(rt.arrive_loc, rt.get_arrive_loc_display()) for rt in routes])
+        depart_locs = set([(rt.depart_loc, rt.get_depart_loc_display()) for rt in routes])
+
+
+        return render(request, "index.html", {'arrive_loc':arrive_locs, 'depart_loc':depart_locs})
 
     def post(self, request):
         depart = request.POST.get('depart')
@@ -153,7 +161,7 @@ class BookView(LoginRequiredMixin, View):
 
         bus_s = get_object_or_404(BusSchedule, pk=bsid)
 
-        diff = bus_s.depart_date - datetime.now().replace(tzinfo=timezone.utc)
+        diff = bus_s.depart_date - timezone.now()
 
 
         if diff.total_seconds()/60<15:
@@ -162,7 +170,8 @@ class BookView(LoginRequiredMixin, View):
         if pidx:
             resp = requests.post(
                                     "https://a.khalti.com/api/v2/epayment/lookup/",
-                                    data={'pidx':pidx},
+                                    headers=headers,
+                                    data=json.dumps({'pidx':pidx}),
                                 ).json()
             
             tickets = request.session.get('tickets')
@@ -175,6 +184,11 @@ class BookView(LoginRequiredMixin, View):
             elif not TransactionTable.objects.filter(pk=purchase_order_id) and resp['status']=='Completed':
                 add_ticket_order(request, tickets, pidx, purchase_order_id)
 
+            #    orders = TicketOrder.objects.filter(user_id=request.user)
+                
+                rq = [request.user.id, request.user.email]
+
+                Send_ticket.delay(rq)
         
         tickets = Ticket.objects.filter(schedule_id=bus_s)
 
@@ -187,8 +201,8 @@ class BookView(LoginRequiredMixin, View):
         tickets = json.loads(request.body.decode('UTF-8'))['selectedSeats']
         qty = len(tickets)
 
-        db_qty = TicketOrder.objects.filter(user_id=request.user).aggregate(
-                                                    db_qty = Sum('quantity')
+        db_qty = TicketOrder.objects.filter(user_id=request.user,
+                                            ticket_id__schedule_id=bsid).aggregate(db_qty = Sum('quantity')
                                                 )['db_qty']
 
         if not db_qty:
@@ -202,8 +216,6 @@ class BookView(LoginRequiredMixin, View):
         tik = Ticket.objects.get(pk=tickets[0])
 
         price = tik.schedule_id.route_id.price        
-
-
         
         url = "https://a.khalti.com/api/v2/epayment/initiate/"
 

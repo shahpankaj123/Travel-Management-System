@@ -1,18 +1,16 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect, HttpResponse
 from django.views import View
 from .models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.utils.encoding import smart_str,force_bytes,DjangoUnicodeDecodeError
-from .authentication_backends import CustomAuthBackend
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode,urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 import random
-from .tasks import send_activation_email,send_mail_verify
+from .tasks import send_activation_email,send_mail_verify, send_refund_mail
 from bus_reserve.models import *
  
 
@@ -27,7 +25,7 @@ class Signup(View):
             email = request.POST['email']
             password = request.POST['password']
 
-            if User.objects.filter(email=email):
+            if User.objects.filter(email=email) or User.objects.filter(username=username):
                messages.error(request, "username already exits please try some others")
                return redirect('signup')
             else:
@@ -166,8 +164,17 @@ class Changepassword(View):
 class MyOrder(View):
   def get(self, request, *args, **kwargs):
     user_id=request.user.id  
-    ticket_orders = TicketOrder.objects.filter(user_id=user_id)
-    return render(request,'account/Order.html',{'ticket_orders': ticket_orders})
+    ticket_orders = TicketHistory.objects.filter(user_id=user_id)
+    pending_tickets = TicketOrder.objects.filter(user_id=user_id)
+    return render(request,'account/Order.html',{'ticket_orders': ticket_orders, 'pending_tickets':pending_tickets})
+  
+  def post(self, request):
+      
+      tik_id = request.POST.get('tik_id')
+      
+      send_refund_mail.delay(tik_id)
+
+      return HttpResponse("Refund request has been submitted")
 
 @method_decorator(login_required(login_url='Login'), name='dispatch')  
 class MyDetail(View):
