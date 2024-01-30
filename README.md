@@ -81,8 +81,8 @@ The Travel Management System is a web-based application built with Django, Celer
 
 ## Contributors
 
-- Anuj Bhattarai ([GitHub](https://github.com/anuj))
-- Pankaj Shah ([GitHub](https://github.com/pankaj))
+- Anuj Bhattarai ([GitHub](https://github.com/anuj66283))
+- Pankaj Shah ([GitHub](https://github.com/shahpankaj123))
 
 ## License
 
@@ -93,7 +93,7 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 For any issues or inquiries, please contact the project maintainers:
 
 - Anuj Bhattarai: anuj@example.com
-- Pankaj Shah: pankaj@example.com
+- Pankaj Shah: pshah9360@gmail.com
 
 ## Acknowledgments
 
