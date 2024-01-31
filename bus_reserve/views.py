@@ -2,6 +2,7 @@
 import json
 import requests
 from uuid import uuid4
+from decouple import config
 from datetime import datetime
 
 
@@ -18,8 +19,10 @@ from django.http import HttpResponse, JsonResponse, HttpResponseForbidden
 from account.tasks import Send_ticket
 from .models import BusSchedule, LOCATIONS, Ticket, TicketOrder, TransactionTable, Seat, Route
 
+k_api = config('KHALTI')
+
 headers = {
-        'Authorization': 'key a4c85df6a34f476fb958c71daf37d1be',
+        'Authorization': f'api {k_api}',
         'Content-Type': 'application/json',
 }
 

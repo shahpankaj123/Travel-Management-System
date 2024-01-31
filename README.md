@@ -68,7 +68,10 @@ The Travel Management System is a web-based application built with Django, Celer
    - Configure Celery to use Redis as the message broker.
    - Start Celery:
      ```bash
-     celery -A your_project_name worker -l info
+     celery -A Travel_system worker -l info
+     ```
+     ```bash
+     celery -A Travel_system beat -l info
      ```
 
 5. **Run the Application:**
@@ -92,7 +95,7 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 For any issues or inquiries, please contact the project maintainers:
 
-- Anuj Bhattarai: anuj@example.com
+- Anuj Bhattarai: anujbhattarai66283@gmail0.com
 - Pankaj Shah: pshah9360@gmail.com
 
 ## Acknowledgments

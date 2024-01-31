@@ -53,8 +53,7 @@ def Send_ticket(request):
     subject = 'PDF Attachment'
     message = 'Please find the attached PDF document.'
     from_email = settings.EMAIL_HOST_USER
-    #to_email = orders.user_id.email
-    to_email = 'aasd03434@gmail.com'
+    to_email = request[0]
 
     email = EmailMessage(subject, message, from_email, [to_email])
     email.attach('document.pdf', response.content, 'application/pdf')
@@ -65,6 +64,6 @@ def send_refund_mail(tik_id):
     subject = 'Refund request'
     message = f'Ticket id {tik_id} is asking for refund'
     from_email = settings.EMAIL_HOST_USER
-    to_email = 'aasd03434@gmail.com'
+    to_email = 'aaryanshah651@gmail.com'
 
     EmailMessage(subject, message, from_email, [to_email]).send()
