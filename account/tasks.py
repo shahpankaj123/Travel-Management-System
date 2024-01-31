@@ -36,8 +36,10 @@ def send_mail_verify(email,token,token1):
  
 @shared_task
 def Send_ticket(request):
-    orders = TicketOrder.objects.filter(user_id=request[0])
-
+    print(request)
+    orders = TicketOrder.objects.filter(user_id__email=request[0],\
+                                        ticket_id__schedule_id=request[1]).order_by('-bought_date')[0]
+    print(orders)
     template = get_template('account/ticket.html')
     html_content = template.render({'context': orders})
 
@@ -51,7 +53,8 @@ def Send_ticket(request):
     subject = 'PDF Attachment'
     message = 'Please find the attached PDF document.'
     from_email = settings.EMAIL_HOST_USER
-    to_email = request[1]
+    #to_email = orders.user_id.email
+    to_email = 'aasd03434@gmail.com'
 
     email = EmailMessage(subject, message, from_email, [to_email])
     email.attach('document.pdf', response.content, 'application/pdf')

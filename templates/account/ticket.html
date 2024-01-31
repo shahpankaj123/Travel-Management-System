@@ -107,26 +107,31 @@
           <tr>
             <th>Ticket No</th>
             <th>Seat No</th>
+            <th>Depart location</th>
+            <th>Arrive location</th>
             <th>Price</th>
-            <th>Total</th>
+            <th>Bus model</th>
+            <th>Number plate</th>
           </tr>
         </thead>
         <tbody>
-          {% for orders in context %}
-              {% for ticket in orders.ticket_id.all %}
-                <tr>
-                  <td>{{ticket.ticket_num}}</td>
-                  <td>{{ticket.seat_id.number}}</td>
-                  <td>{{ticket.schedule_id.route_id.price}}</td>
-                </tr>
-                {% endfor %}
+          {% for ticket in context.ticket_id.all %}
+            <tr>
+              <td>{{ticket.ticket_num}}</td>
+              <td>{{ticket.seat_id.number}}</td>
+              <td>{{ticket.schedule_id.route_id.get_arrive_loc_display}}</td>
+              <td>{{ticket.schedule_id.route_id.get_depart_loc_display}}</td>
+              <td>{{ticket.schedule_id.route_id.price}}</td>
+              <td>{{ticket.seat_id.bus_id.model}}</td>
+              <td>{{ticket.seat_id.bus_id.number_plate}}</td>
+            </tr>
           {% endfor %}
         </tbody>
       </table>
 
       <div class="total">
-        <p><strong>Total:</strong> $35.00</p>
-        <p>Payment Due: January 31, 2024</p>
+        <p><strong>Total:</strong>Rs {{context.transaction_id.amount}}</p>
+        <p>Bought date: {{context.bought_date}}</p>
       </div>
     </main>
 

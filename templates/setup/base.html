@@ -40,7 +40,7 @@
     {% if user.is_authenticated %}
     {% for message in messages %}
 	<!-- Flexbox container for aligning the toasts -->
-	<div aria-live="polite" aria-atomic="true" class="d-flex justify-content-center align-items-center position-fixed w-100 mt-3">
+	<div style="z-index: 1;" aria-live="polite" aria-atomic="true" class="d-flex justify-content-center align-items-center position-fixed w-100 mt-3">
 		<!-- Toast itself -->
 		<div class="toast bg-secondary text-white" role="alert" aria-live="assertive" aria-atomic="true">
 		  <div class="toast-header">

@@ -9,6 +9,7 @@ from datetime import datetime
 from django.views import View
 from django.db.models import Sum
 from django.utils import timezone
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse, HttpResponseForbidden
@@ -176,8 +177,6 @@ class BookView(LoginRequiredMixin, View):
             
             tickets = request.session.get('tickets')
 
-            print(resp)
-
             if 'detail' in resp:
                 return HttpResponse(resp['detail'])
 
@@ -186,9 +185,11 @@ class BookView(LoginRequiredMixin, View):
 
             #    orders = TicketOrder.objects.filter(user_id=request.user)
                 
-                rq = [request.user.id, request.user.email]
+                rq = [request.user.email, bsid]
 
                 Send_ticket.delay(rq)
+
+                messages.success(request, "Ticket booked check your email for invoice")
         
         tickets = Ticket.objects.filter(schedule_id=bus_s)
 
