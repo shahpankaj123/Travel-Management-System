@@ -16,14 +16,14 @@ class UserAdmin(BaseUserAdmin):
             if request.user.is_admin:
                 return (
                     ("User Credentials", {"fields": ["email", "password"]}),
-                    ("Personal info", {"fields": ["username", "ph"]}),
+                    ("Personal info", {"fields": ["username", "ph","address"]}),
                     ("Permissions", {"fields": ['is_superuser','is_admin','is_active','is_staff_member','is_merchant','groups','user_permissions']}),
                     ("Token_Verify", {"fields": ["tc"]}),
                 )
             elif request.user.is_staff_member:
                 return (
                     ("User Credentials", {"fields": ["email", "password"]}),
-                    ("Personal info", {"fields": ["username", "ph"]}),
+                    ("Personal info", {"fields": ["username", "ph","address"]}),
                     ("Token_Verify", {"fields": ["tc"]}),
               )
       
@@ -32,9 +32,9 @@ class UserAdmin(BaseUserAdmin):
     
     def get_form(self, request, obj=None, **kwargs):
         if request.user.is_admin:
-            self.add_fieldsets[0][1]['fields'] = ['email','password1','password2','username','ph','is_superuser','is_admin','is_active','is_staff_member','is_merchant','groups','user_permissions']
+            self.add_fieldsets[0][1]['fields'] = ['email','password1','password2','username','ph','address','is_superuser','is_admin','is_active','is_staff_member','is_merchant','groups','user_permissions']
         if request.user.is_staff_member:
-            self.add_fieldsets[0][1]['fields'] = ['email','password1','password2','username','ph','is_merchant','is_active','groups']
+            self.add_fieldsets[0][1]['fields'] = ['email','password1','password2','username','ph','address','is_merchant','is_active','groups']
         return super().get_form(request, obj, **kwargs)
     
     search_fields = ["email"]

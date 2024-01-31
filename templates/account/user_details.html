@@ -73,6 +73,7 @@ button:hover {
     <h3>Username: {{request.user.username}}</h3>
     <h3>Email: {{request.user.email}}</h3>
     <h3>Phone Number: {{request.user.ph}}</h3>
+    <h3>Address: {{request.user.address}}</h3>
     <br>
     <a href ="{% url 'edit_user' %}"><button type="submit">Edit</button></a>  
   </div>

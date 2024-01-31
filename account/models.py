@@ -2,14 +2,15 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, Permis
 from django.db import models
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, username, ph, password=None, password2=None):
+    def create_user(self, email, username, ph, address, password=None, password2=None):
         if not email:
             raise ValueError("Users must have an email address")
 
         user = self.model(
             email=self.normalize_email(email),
             username=username,
-            ph=ph
+            ph=ph,
+            address=address,
         )
 
         if password != password2:
@@ -18,7 +19,7 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, username, ph, password=None,**extra_fields):
+    def create_superuser(self, email, username, ph, address,password=None,**extra_fields):
         """
         Creates and saves a superuser with the given email, date of
         birth, and password.
@@ -28,6 +29,7 @@ class UserManager(BaseUserManager):
             email=email,
             username=username,
             ph=ph,
+            address=address,
         )
 
         user.set_password(password)
@@ -47,6 +49,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     tc = models.IntegerField(default=0)
     ph = models.CharField(max_length=20)
     username = models.CharField(max_length=200)
+    address=models.CharField(max_length=50)
     is_active = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
 
@@ -60,7 +63,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ['username', 'ph']
+    REQUIRED_FIELDS = ['username', 'ph','address']
 
     def __str__(self):
         return self.email

@@ -24,12 +24,13 @@ class Signup(View):
             phone = request.POST['number']
             email = request.POST['email']
             password = request.POST['password']
+            address=request.POST['address']
 
             if User.objects.filter(email=email) or User.objects.filter(username=username):
                messages.error(request, "username already exits please try some others")
                return redirect('signup')
             else:
-                my_user=User.objects.create_user(email=email,username=username,ph=phone)
+                my_user=User.objects.create_user(email=email,username=username,ph=phone,address=address)
                 my_user.set_password(password)
                 my_user.save()           
                 uid=urlsafe_base64_encode(force_bytes(my_user.id))
@@ -226,12 +227,14 @@ class Edit_user(View):
         username=request.POST['username']
         email=request.POST['email']
         ph=request.POST['ph']
+        address=request.POST['address']
 
         user=User.objects.get(id=request.user.id)
 
         user.username=username
         user.email=email
         user.ph=ph
+        user.address=address
 
         user.save()
         messages.success(request,"Details Changed successfully")
