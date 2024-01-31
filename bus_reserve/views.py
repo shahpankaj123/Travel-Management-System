@@ -22,7 +22,7 @@ from .models import BusSchedule, LOCATIONS, Ticket, TicketOrder, TransactionTabl
 k_api = config('KHALTI')
 
 headers = {
-        'Authorization': f'api {k_api}',
+        'Authorization': f'key {k_api}',
         'Content-Type': 'application/json',
 }
 
@@ -204,7 +204,6 @@ class BookView(LoginRequiredMixin, View):
     def post(self, request, bsid):
         tickets = json.loads(request.body.decode('UTF-8'))['selectedSeats']
         qty = len(tickets)
-
         db_qty = TicketOrder.objects.filter(user_id=request.user,
                                             ticket_id__schedule_id=bsid).aggregate(db_qty = Sum('quantity')
                                                 )['db_qty']
@@ -224,7 +223,7 @@ class BookView(LoginRequiredMixin, View):
         url = "https://a.khalti.com/api/v2/epayment/initiate/"
 
         purchase_detail = get_khalti_payload(request, price, qty)
-        
+        print(headers)
         resp = requests.post(url, headers=headers, data=json.dumps(purchase_detail)).json()
 
         return JsonResponse(resp)
