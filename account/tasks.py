@@ -50,8 +50,8 @@ def Send_ticket(request):
     response = HttpResponse(pdf_data.getvalue(), content_type='application/pdf')
     response['Content-Disposition'] = 'filename="document.pdf"'
 
-    subject = 'PDF Attachment'
-    message = 'Please find the attached PDF document.'
+    subject = 'Ticket Attachment'
+    message = 'Please check your attached ticket'
     from_email = settings.EMAIL_HOST_USER
     to_email = request[0]
 
