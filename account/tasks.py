@@ -56,7 +56,7 @@ def Send_ticket(request):
     to_email = request[0]
 
     email = EmailMessage(subject, message, from_email, [to_email])
-    email.attach('document.pdf', response.content, 'application/pdf')
+    email.attach('ticket.pdf', response.content, 'application/pdf')
     email.send()
 
 @shared_task
