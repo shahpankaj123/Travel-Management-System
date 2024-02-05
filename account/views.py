@@ -77,6 +77,8 @@ class Login(View):
                 if user.is_active:
                   login(request,myuser)
                   request.session['email'] =email
+                  if user.is_admin or user.is_merchant or user.is_staff_member:
+                      return redirect('/admin/')
                   messages.success(request,"Login successfully")
                   return redirect('home')
                 else:

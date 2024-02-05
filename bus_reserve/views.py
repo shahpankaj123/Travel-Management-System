@@ -168,8 +168,8 @@ class BookView(LoginRequiredMixin, View):
         diff = bus_s.depart_date - timezone.now()
 
 
-        if diff.total_seconds()/60<15:
-            return HttpResponse("Bus already boarded")
+        # if diff.total_seconds()/60<15:
+        #     return HttpResponse("Bus already boarded")
        
         if pidx:
             resp = requests.post(
