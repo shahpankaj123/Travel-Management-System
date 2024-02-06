@@ -26,8 +26,8 @@ class Route(models.Model):
     id = models.UUIDField(default=uuid4, primary_key=True, blank=True)
     depart_loc = models.CharField(max_length=20, choices=LOCATIONS, default='1')
     arrive_loc = models.CharField(max_length=20, choices=LOCATIONS, default='1')
-    distance = models.IntegerField(default=1)
-    price = models.IntegerField(default=100)
+    distance = models.FloatField(default=1)
+    price = models.FloatField(default=100)
 
     class Meta:
         verbose_name = "Route"
@@ -53,7 +53,7 @@ class Bus(models.Model):
 
 class BusSchedule(models.Model):
     id = models.UUIDField(default=uuid4, primary_key=True, blank=True)
-    bus_id = models.OneToOneField(Bus, on_delete=models.CASCADE)
+    bus_id = models.ForeignKey(Bus, on_delete=models.CASCADE)
     depart_date = models.DateTimeField()
     route_id = models.ForeignKey(Route, on_delete=models.CASCADE)
 
@@ -90,7 +90,6 @@ class Seat(models.Model):
     id = models.UUIDField(default=uuid4, primary_key=True, blank=True)
     bus_id = models.ForeignKey(Bus, on_delete=models.CASCADE)
     number = models.CharField(max_length=3)
-    is_free = models.BooleanField(default=True, blank=True)
 
     class Meta:
         verbose_name = "Seat"
@@ -103,7 +102,8 @@ class Ticket(models.Model):
     id = models.UUIDField(default=uuid4, primary_key=True, blank=True)
     ticket_num = models.CharField(max_length=10)
     schedule_id = models.ForeignKey(BusSchedule, on_delete=models.CASCADE)
-    seat_id = models.OneToOneField(Seat, on_delete=models.CASCADE)
+    seat_id = models.ForeignKey(Seat, on_delete=models.CASCADE)
+    is_bought = models.BooleanField(default=False, blank=True)
 
     class Meta:
         verbose_name = "Ticket"
@@ -134,7 +134,7 @@ class TransactionTable(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=10, blank=True, null=True)
     pidx = models.CharField(max_length=256, blank=True, null=True)
-    amount = models.IntegerField(default=100)
+    amount = models.FloatField(default=100)
     status = models.CharField(max_length=20, choices=t_choices, default='1')
     khalti_tran_id = models.CharField(max_length=256, blank=True)
 
@@ -153,7 +153,7 @@ class TicketHistory(models.Model):
     seat_number = models.CharField(max_length=10, blank=True)
     depart_loc = models.CharField(max_length=25, blank=True)
     arrive_loc = models.CharField(max_length=25, blank=True)
-    price = models.IntegerField(default=100, blank=True)
+    price = models.FloatField(default=100, blank=True)
     depart_date = models.DateTimeField(blank=True)
     bus_model = models.CharField(max_length=25, blank=True)
 

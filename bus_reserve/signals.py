@@ -87,8 +87,8 @@ def populate_ticket_history(sender, instance=None, created=False, **kwargs):
         price = tik_ord.transaction_id.amount/tik_ord.quantity
 
         for tik in tik_ord.ticket_id.all():
-            tik.seat_id.is_free=True
-            tik.seat_id.save()
+            tik.is_bought=False
+            tik.save()
 
         TicketHistory.objects.bulk_create([TicketHistory(
             tran_id = tik_ord.transaction_id,

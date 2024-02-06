@@ -170,7 +170,7 @@
                 {% for st in tickets %}
                     <div class="grid-row">
                         {% for ticket in st %}
-                            {% if ticket.seat_id.is_free %}
+                            {% if not ticket.is_bought %}
                                 <div class="grid-item seat-available" id="{{ ticket.seat_id.number }}" onclick="toggleSeat(this)">
                                     <i class="fas fa-chair fa-2x"></i>
                                     <p class="seat-number">{{ ticket.seat_id.number }}</p>

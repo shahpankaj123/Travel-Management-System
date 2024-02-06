@@ -30,7 +30,7 @@ headers = {
 def add_ticket_order(request, tickets, pidx, p_id):
 
     k_t_id = request.GET.get('transaction_id')
-    amount = int(request.GET.get('amount'))/100
+    amount = float(request.GET.get('amount'))/100
     mobile = request.GET.get('mobile')
     user_id = request.user
     qty = len(tickets)
@@ -56,8 +56,8 @@ def add_ticket_order(request, tickets, pidx, p_id):
     
     for ticket in tik_obj:
         tik.ticket_id.add(ticket)
-        ticket.seat_id.is_free = False
-        ticket.seat_id.save()
+        ticket.is_bought = True
+        ticket.save()
 
 # generates payload to post to khalti server
 def get_khalti_payload(request, price, qty):
@@ -92,10 +92,10 @@ class HomeView(View):
 
     """
     def get(self, request):
-        routes = Route.objects.all()
+        routes = BusSchedule.objects.all()
 
-        arrive_locs = set([(rt.arrive_loc, rt.get_arrive_loc_display()) for rt in routes])
-        depart_locs = set([(rt.depart_loc, rt.get_depart_loc_display()) for rt in routes])
+        arrive_locs = set([(bs.route_id.arrive_loc, bs.route_id.get_arrive_loc_display()) for bs in routes])
+        depart_locs = set([(bs.route_id.depart_loc, bs.route_id.get_depart_loc_display()) for bs in routes])
 
 
         return render(request, "index.html", {'arrive_loc':arrive_locs, 'depart_loc':depart_locs})
@@ -135,7 +135,7 @@ class BusesView(View):
         seats = []
         
         for bus in buses:
-            reserved = Seat.objects.filter(bus_id=bus.bus_id, is_free=False).count()
+            reserved = Ticket.objects.filter(schedule_id=bus.id, is_bought=True).count()
             seats.append(bus.bus_id.capacity-reserved)
             
         return render(request, 'buses.html', {'buses':zip(buses, seats)})
@@ -204,9 +204,7 @@ class BookView(LoginRequiredMixin, View):
     def post(self, request, bsid):
         tickets = json.loads(request.body.decode('UTF-8'))['selectedSeats']
         qty = len(tickets)
-        db_qty = TicketOrder.objects.filter(user_id=request.user,
-                                            ticket_id__schedule_id=bsid).aggregate(db_qty = Sum('quantity')
-                                                )['db_qty']
+        db_qty = len(TicketOrder.objects.filter(user_id=request.user, ticket_id__schedule_id=bsid))
 
         if not db_qty:
             db_qty = 0
@@ -223,7 +221,7 @@ class BookView(LoginRequiredMixin, View):
         url = "https://a.khalti.com/api/v2/epayment/initiate/"
 
         purchase_detail = get_khalti_payload(request, price, qty)
-        print(headers)
+        
         resp = requests.post(url, headers=headers, data=json.dumps(purchase_detail)).json()
 
         return JsonResponse(resp)

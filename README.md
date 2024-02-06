@@ -82,6 +82,13 @@ The Travel Management System is a web-based application built with Django, Celer
 6. **Access the Application:**
    - Open your web browser and navigate to `http://localhost:8000`.
 
+## Deafault Passwords
+
+1. **admin**
+   - `admin@gmail.com` `admin`
+   - `staff@staff.com` `Staff@1234`
+   - `merchant@merchant.com` `Merc@1234`
+
 ## Contributors
 
 - Anuj Bhattarai ([GitHub](https://github.com/anuj66283))
@@ -95,7 +102,7 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 For any issues or inquiries, please contact the project maintainers:
 
-- Anuj Bhattarai: anujbhattarai66283@gmail0.com
+- Anuj Bhattarai: anujbhattarai66283@gmail.com
 - Pankaj Shah: pshah9360@gmail.com
 
 ## Acknowledgments
