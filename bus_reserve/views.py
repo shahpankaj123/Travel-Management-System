@@ -1,5 +1,7 @@
 #external
 import json
+from typing import Any
+from django.http.response import HttpResponse as HttpResponse
 import requests
 from uuid import uuid4
 from decouple import config
@@ -13,7 +15,7 @@ from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, JsonResponse, HttpResponseForbidden
+from django.http import HttpRequest, HttpResponse, JsonResponse, HttpResponseForbidden
 
 #internal
 from account.tasks import Send_ticket
@@ -141,7 +143,7 @@ class BusesView(View):
         return render(request, 'buses.html', {'buses':zip(buses, seats)})
 
 
-class BookView(LoginRequiredMixin, View):
+class BookView(View):
     """
         Here user can books seats in bus.
         In the initial get method the user can see all the available seats and select at least one
@@ -149,11 +151,16 @@ class BookView(LoginRequiredMixin, View):
         After confirming the payment in the get method their purchase will eb successful and they
         can further book more seats
     """
-    login_url = 'user/login/'
+    login_url = '/user/Login/'
+    
+    def dispatch(self, request, *args, **kwargs):
+        if self.request.method.lower() == 'post':
+            return LoginRequiredMixin.dispatch(self, request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def handle_no_permission(self):
         if self.request.method == 'POST':
-            return HttpResponseForbidden("Login required for this action")
+            return JsonResponse({"login_url":self.login_url}, status=403)
         return super().handle_no_permission()
 
     def get(self, request, bsid):

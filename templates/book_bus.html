@@ -287,8 +287,16 @@ function updateSelectedSeats() {
                     location.reload();
                     return;
                 }
+
                 window.location.href = responseJson.payment_url;
-            } else {
+            } 
+            
+            else if (xhr.status == 403) {
+                var responseJson = JSON.parse(xhr.responseText);
+                window.location.href = window.location.origin+responseJson.login_url
+            }
+            
+            else {
                 console.error('Request failed with status:', xhr.status);
                 // You can handle the error response here
             }
