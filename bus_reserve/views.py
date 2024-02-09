@@ -86,6 +86,8 @@ def get_khalti_payload(request, price, qty):
     purchase_detail['product_details'][0]['quantity'] = qty
     purchase_detail['product_details'][0]['unit_price'] = price
 
+    print(purchase_detail)
+
     return purchase_detail
 
 class HomeView(View):
@@ -143,6 +145,7 @@ class BusesView(View):
         return render(request, 'buses.html', {'buses':zip(buses, seats)})
 
 
+
 class BookView(View):
     """
         Here user can books seats in bus.
@@ -154,14 +157,15 @@ class BookView(View):
     login_url = '/user/Login/'
     
     def dispatch(self, request, *args, **kwargs):
-        if self.request.method.lower() == 'post':
-            return LoginRequiredMixin.dispatch(self, request, *args, **kwargs)
+        if not request.user.is_authenticated and self.request.method == 'POST':
+            return JsonResponse({"login_url":self.login_url}, status=403)
+        
         return super().dispatch(request, *args, **kwargs)
 
-    def handle_no_permission(self):
-        if self.request.method == 'POST':
-            return JsonResponse({"login_url":self.login_url}, status=403)
-        return super().handle_no_permission()
+    # def handle_no_permission(self):
+    #     if self.request.method == 'POST':
+    #         return JsonResponse({"login_url":self.login_url}, status=403)
+    #     return super().handle_no_permission()
 
     def get(self, request, bsid):
         if "favicon.png" in request.path:
@@ -232,6 +236,8 @@ class BookView(View):
         purchase_detail = get_khalti_payload(request, price, qty)
         
         resp = requests.post(url, headers=headers, data=json.dumps(purchase_detail)).json()
+
+        print(resp)
 
         return JsonResponse(resp)
 
