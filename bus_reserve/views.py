@@ -1,6 +1,5 @@
 #external
 import json
-from typing import Any
 from django.http.response import HttpResponse as HttpResponse
 import requests
 from uuid import uuid4
@@ -10,7 +9,6 @@ from datetime import datetime
 
 #django
 from django.views import View
-from django.db.models import Sum
 from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -69,11 +67,13 @@ def get_khalti_payload(request, price, qty):
     cur_path = request.get_full_path()
     phone = request.user.ph
     t_id = uuid4()
+    uri = request.build_absolute_uri("/")[:-1]
 
     with open("static/json/purchase_detail.json", "r") as f:
         purchase_detail = json.load(f)
 
-    purchase_detail['return_url'] = purchase_detail['website_url']+cur_path
+    purchase_detail['website_url'] = uri
+    purchase_detail['return_url'] = uri+cur_path
 
     purchase_detail['customer_info']['name'] = username
     purchase_detail['customer_info']['email'] = email
@@ -226,6 +226,8 @@ class BookView(View):
         price = tik.schedule_id.route_id.price        
         
         url = "https://a.khalti.com/api/v2/epayment/initiate/"
+
+
 
         purchase_detail = get_khalti_payload(request, price, qty)
         
